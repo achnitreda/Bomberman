@@ -48,6 +48,6 @@ html, body {
     height: 20px;
     background-color: aqua;
     top: 50px;
-    left: 50px;
+    left: 50px; 
     z-index: 10;
 }
