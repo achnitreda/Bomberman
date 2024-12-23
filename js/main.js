@@ -10,11 +10,17 @@ console.log(player.neighborCells);
 
 
 document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+    if (e.key === "ArrowRight") {
         if (!animation.id) {
-            animation.id = requestAnimationFrame(() => player.move(e.key.slice(5), grid))
+            animation.id = requestAnimationFrame(() => player.moveRight(grid))
         }
     }
+
+    // if (e.key === "ArrowLeft") {
+    //     if (!animation.id) {
+    //         animation.id = requestAnimationFrame(() => player.moveLeft(grid))
+    //     }
+    // }
 });
 
 document.addEventListener("keyup", () => {
@@ -62,7 +68,7 @@ document.addEventListener("keypress", e => {
                 bombBottom.classList.add("empty")
                 grid[i+1][j] = 0;
             }
-            // player.updateNeighborCells(grid)
+            player.updateNeighborCells(grid)
             bomb.remove()
             if (player.cell.i == i && player.cell.j == j ||
                 player.cell.i == i && player.cell.j == j+1 ||
@@ -82,3 +88,5 @@ document.addEventListener("keypress", e => {
         },1000)
     }
 })
+
+// player.updateBounds(grid   )

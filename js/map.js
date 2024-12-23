@@ -51,7 +51,8 @@ export function mapVisual(map, player) {
         })
     });
 
-    player.updateNeighborCells(grid);
+    // player.updateNeighborCells(grid);
+    player.updateBounds(grid);
     return grid;
 }
 
