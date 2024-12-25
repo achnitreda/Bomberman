@@ -20,6 +20,7 @@ html, body {
     width: 40px;
     height: 40px;
     border: solid 1px gray;
+    box-sizing: border-box;
 }
 
 .empty {

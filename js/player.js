@@ -1,6 +1,5 @@
 import { mapCells } from "./map.js";
-const SPEED = 1;
-let newCell = false;
+const SPEED = 2;
 
 export let animation = {
     id: null
@@ -8,12 +7,17 @@ export let animation = {
 
 export const player = {
     element: document.getElementById("player"),
-    cell: {
+    currentCell: {
         i: 1,
         j: 1
     },
 
     targetCell: {
+        i: 1,
+        j: 1,
+    },
+    
+    possibleCell: {
         i: 1,
         j: 1,
     },
@@ -23,6 +27,7 @@ export const player = {
         y: 0
     },
 
+        // console.log("x=>", this.position.x,"y=>",
     bounds: {
         left: 0,
         top: 0,
@@ -30,7 +35,7 @@ export const player = {
         bottom: 0,
     },
 
-    passable: {
+    passablility: {
         left: false,
         top: false,
         right: false,
@@ -38,228 +43,127 @@ export const player = {
     },
 
     updatePassability: function (grid) {
-        console.log("i=>",this.cell.i,"j=>",this.cell.j);
-        console.log(grid);
-        this.passable.left = grid[this.cell.i][this.cell.j - 1] == 0;
-        this.passable.top = grid[this.cell.i - 1][this.cell.j] == 0;
-        this.passable.right = grid[this.cell.i][this.cell.j + 1] == 0;
-        this.passable.bottom = grid[this.cell.i + 1][this.cell.j] == 0;
+        this.passablility.left = grid[this.currentCell.i][this.currentCell.j-1] == 0;
+        this.passablility.top = grid[this.currentCell.i-1][this.currentCell.j] == 0;
+        this.passablility.right = grid[this.currentCell.i][this.currentCell.j+1] == 0;
+        this.passablility.bottom = grid[this.currentCell.i+1][this.currentCell.j] == 0;
     },
 
     updateBounds: function (grid) {
-        const playerCell = mapCells[`cell${this.cell.i}#${this.cell.j}`];
-        console.log(playerCell);
+        const playerCell = mapCells[`cell${this.currentCell.i}#${this.currentCell.j}`];
         
         for (let bound in this.bounds) {
             this.bounds[bound] = playerCell.getBoundingClientRect()[bound];
         }
-
+        
         this.updatePassability(grid);
-        console.log(this.bounds);
+        console.log(this.currentCell.i, this.currentCell.j);
+        console.log(this.targetCell.i, this.targetCell.j, "\n", grid);
 
     },
 
     moveRight: function (grid) {
-       
-        
         const playerRects = this.element.getBoundingClientRect();
-        // const j = this.cell.j;
 
         if (playerRects.right + SPEED <= this.bounds.right) {
             this.position.x += SPEED;
         } else {
-            if (this.passable.right) {
+            if (this.passablility.right /*&& grid[this.targetCell.i][this.targetCell.j+1]==0*/) {
                 this.position.x += SPEED;
             }
         }
 
         if (playerRects.left+10 > this.bounds.right) {
-            console.log(playerRects.left+10, this.bounds.right);
-            
-            console.log("pass");
-            this.cell.j++;
+            this.currentCell.j++;
             this.updateBounds(grid);
-            
         }
 
+        if (playerRects.right > this.bounds.right && this.currentCell.j == this.targetCell.j) {
+            this.targetCell.j = this.currentCell.j+1;
+            // this.targetCell.i = this.cell.i;
+            // console.log(this.targetCell);
+        }
+        // console.log("x=>", this.position.x,"y=>", this.position.y);
+        
         this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-        animation.id = requestAnimationFrame(() => this.moveRight())
+        animation.id = requestAnimationFrame(() => this.moveRight(grid))
     },
 
-    // neighborCells: {
-    //     left: { border: 0, canPass: false },
-    //     top: { border: 0, canPass: false },
-    //     right: { border: 0, canPass: false },
-    //     bottom: { border: 0, canPass: false },
-    // },
-
-    // updateNeighborCells: function (grid) {
-    //     const leftCell = mapCells[`cell${this.cell.i}#${this.cell.j - 1}`];
-    //     const topCell = mapCells[`cell${this.cell.i - 1}#${this.cell.j}`];
-    //     const rightCell = mapCells[`cell${this.cell.i}#${this.cell.j + 1}`];
-    //     const bottomtCell = mapCells[`cell${this.cell.i + 1}#${this.cell.j}`];
-
-    //     this.neighborCells.left.border = leftCell.getBoundingClientRect().right;
-    //     this.neighborCells.left.canPass = grid[this.cell.i][this.cell.j - 1] == 0;
-
-    //     this.neighborCells.top.border = topCell.getBoundingClientRect().bottom;
-    //     this.neighborCells.top.canPass = grid[this.cell.i - 1][this.cell.j] == 0;
-
-    //     this.neighborCells.right.border = rightCell.getBoundingClientRect().left;
-    //     this.neighborCells.right.canPass = grid[this.cell.i][this.cell.j + 1] == 0;
-
-    //     this.neighborCells.bottom.border = bottomtCell.getBoundingClientRect().top;
-    //     this.neighborCells.bottom.canPass = grid[this.cell.i + 1][this.cell.j] == 0;
-    // },
-
-    // mojveRight: function (grid) {
-    //     // const playerCellElement = mapCells[`cell${this.cell.i}#${this.cell.j}`];
-
-    //     const playerRects = this.element.getBoundingClientRect();
-    //     // const cellRects = playerCellElement.getBoundingClientRect();
-    //     if (playerRects.right + SPEED >= this.neighborCells.right.border) {
-    //         if (this.neighborCells.right.canPass && grid[this.targetCell.i][this.targetCell.j] == 0) {
-    //             this.position.x += SPEED;
-    //         }
-    //     } else {
-    //         this.position.x += SPEED;
-    //     }
-
-    //     // target cell
-    //     if (playerRects.right > this.neighborCells.right.border && this.cell.j == this.targetCell.j /*to check just one time */) {
-    //         this.targetCell.j = this.cell.j + 1;
-    //     }
-
-    //     this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-    //     animation.id = requestAnimationFrame(() => this.moveRight(grid))
-    // },
-
-    // moveLeft: function (grid) {
-    //     // const playerCellElement = mapCells[`cell${this.cell.i}#${this.cell.j}`];
-
-    //     const playerRects = this.element.getBoundingClientRect();
-    //     // const cellRects = playerCellElement.getBoundingClientRect();
-
-    //     if (playerRects.left <= this.neighborCells.left.border) {
-    //         if (this.neighborCells.left.canPass && grid[this.targetCell.i][this.targetCell.j] == 0) {
-    //             this.position.x -= SPEED;
-    //         }
-    //     } else {
-    //         this.position.x -= SPEED;
-    //     }
-
-    //     if (playerRects.left < this.neighborCells.left.border && this.cell.j == this.targetCell.j) {
-    //         this.targetCell.j = this.cell.j - 1;
-    //         // this.targetCell.i = this.cell.i;
-    //         // console.log(this.targetCell);
-    //     }
-
-    //     if (playerRects.right <= this.neighborCells.left.border) {
-    //         this.cell.j--;
-    //         this.updateNeighborCells(grid);
-    //     }
-    //     this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-    //     animation.id = requestAnimationFrame(() => this.moveLeft(grid))
-    // },
-
-    move: function (direction, grid) {
-        const playerCellElement = mapCells[`cell${this.cell.i}#${this.cell.j}`];
-
+    moveLeft: function (grid) {
         const playerRects = this.element.getBoundingClientRect();
-        const cellRects = playerCellElement.getBoundingClientRect();
-        // console.log("cell =>",cellRects);
-        // console.log("player =>",playerRects);
 
-        if (direction == "Right") {
-            if (playerRects.right >= this.neighborCells.right.border) {
-                if (this.neighborCells.right.canPass && grid[this.targetCell.i][this.targetCell.j] == 0) {
-                    this.position.x += SPEED;
-                }
-            } else {
-                this.position.x += SPEED;
-            }
-
-            if (playerRects.right > this.neighborCells.right.border && this.cell.j == this.targetCell.j) {
-                this.targetCell.j = this.cell.j + 1;
-                // this.targetCell.i = this.cell.i;
-                // console.log(this.targetCell);
-            }
-
-            if (playerRects.left >= this.neighborCells.right.border) {
-                console.log(this.cell);
-                this.cell.j++;
-                console.log(this.cell);
-
-                this.updateNeighborCells(grid);
-            }
-
-        } else if (direction == "Left") {
-            if (playerRects.left <= this.neighborCells.left.border) {
-                if (this.neighborCells.left.canPass && grid[this.targetCell.i][this.targetCell.j] == 0) {
-                    this.position.x -= SPEED;
-                }
-            } else {
-                this.position.x -= SPEED;
-            }
-
-            if (playerRects.left < this.neighborCells.left.border && this.cell.j == this.targetCell.j) {
-                this.targetCell.j = this.cell.j - 1;
-                // this.targetCell.i = this.cell.i;
-                // console.log(this.targetCell);
-            }
-
-            if (playerRects.right <= this.neighborCells.left.border) {
-                this.cell.j--;
-                this.updateNeighborCells(grid);
-            }
-        } else if (direction == "Up") {
-            if (playerRects.top <= this.neighborCells.top.border) {
-                if (this.neighborCells.top.canPass && grid[this.targetCell.i][this.targetCell.j] == 0) {
-                    this.position.y -= SPEED;
-                }
-            } else {
-                this.position.y -= SPEED;
-            }
-
-            if (playerRects.top < this.neighborCells.top.border && this.cell.i == this.targetCell.i) {
-                this.targetCell.i = this.cell.i - 1;
-                // this.targetCell.j = this.cell.j;
-                // console.log(this.targetCell);
-            }
-
-            if (playerRects.bottom <= this.neighborCells.top.border) {
-                this.cell.i--;
-                this.updateNeighborCells(grid);
-            }
+        if (playerRects.left - SPEED >= this.bounds.left) {
+            this.position.x -= SPEED;
         } else {
-            if (playerRects.bottom >= this.neighborCells.bottom.border) {
-                if (this.neighborCells.bottom.canPass && grid[this.targetCell.i][this.targetCell.j] == 0) {
-                    this.position.y += SPEED;
-                }
-            } else {
-                this.position.y += SPEED;
-            }
-
-            if (playerRects.bottom > this.neighborCells.bottom.border && this.cell.i == this.targetCell.i) {
-                this.targetCell.i = this.cell.i + 1;
-                // this.targetCell.j = this.cell.j;
-                // console.log(this.targetCell);
-            }
-
-            if (playerRects.top >= this.neighborCells.bottom.border) {
-                this.cell.i++;
-                this.updateNeighborCells(grid);
+            if (this.passablility.left /*&& grid[this.targetCell.i][this.targetCell.j-1]==0*/) {
+                this.position.x -= SPEED;
             }
         }
 
-        if (playerRects.top > cellRects.top && playerRects.left > cellRects.left && playerRects.right < cellRects.right && playerRects.bottom < cellRects.bottom) {
-            // console.log("yes");
+        if (playerRects.right-10 < this.bounds.left) {
+            this.currentCell.j--;
+            this.updateBounds(grid);
+        }
 
-            this.targetCell.i = this.cell.i;
-            this.targetCell.j = this.cell.j;
+        if (playerRects.left < this.bounds.left && this.currentCell.j == this.targetCell.j) {
+            this.targetCell.j = this.currentCell.j-1;
+            // this.targetCell.i = this.cell.i;
+            // console.log(this.targetCell);
+        }
+        // console.log("x=>", this.position.x,"y=>", this.position.y);
+        this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
+        animation.id = requestAnimationFrame(() => this.moveLeft(grid))
+    },
+
+    moveDown: function (grid) {
+        const playerRects = this.element.getBoundingClientRect();
+
+        if (playerRects.bottom + SPEED <= this.bounds.bottom /*&& grid[this.targetCell.i+1][this.targetCell.j]==0*/) {
+            this.position.y += SPEED;
+        } else {
+            if (this.passablility.bottom) {
+                this.position.y += SPEED;
+            }
+        }
+
+        if (playerRects.top+10 > this.bounds.bottom) {
+            this.currentCell.i++;
+            this.updateBounds(grid);
+        }
+
+        if (playerRects.bottom > this.bounds.bottom && this.currentCell.i == this.targetCell.i) {
+            this.targetCell.i = this.currentCell.i+1;
+            // this.targetCell.i = this.cell.i;
+            // console.log(this.targetCell);
         }
 
         this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-        animation.id = requestAnimationFrame(() => this.move(direction, grid))
-    }
+        animation.id = requestAnimationFrame(() => this.moveDown(grid))
+    },
+
+    moveUp: function (grid) {
+        const playerRects = this.element.getBoundingClientRect();
+
+        if (playerRects.top - SPEED >= this.bounds.top /*&& grid[this.targetCell.i-1][this.targetCell.j]==0*/) {
+            this.position.y -= SPEED;
+        } else {
+            if (this.passablility.top) {
+                this.position.y -= SPEED;
+            }
+        }
+
+        if (playerRects.bottom-10 < this.bounds.top) {
+            this.currentCell.i--;
+            this.updateBounds(grid);
+        }
+
+        if (playerRects.top < this.bounds.top && this.currentCell.i == this.targetCell.i) {
+            this.targetCell.i = this.currentCell.i-1;
+            // this.targetCell.i = this.cell.i;
+            // console.log(this.targetCell);
+        }
+
+        this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
+        animation.id = requestAnimationFrame(() => this.moveUp(grid))
+    },
 }
