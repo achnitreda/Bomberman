@@ -1,6 +1,7 @@
 import { mapCells } from "./map.js";
 const SPEED = 2;
 
+
 export let animation = {
     id: null
 };
@@ -16,18 +17,12 @@ export const player = {
         i: 1,
         j: 1,
     },
-    
-    possibleCell: {
-        i: 1,
-        j: 1,
-    },
 
     position: {
         x: 0,
         y: 0
     },
 
-        // console.log("x=>", this.position.x,"y=>",
     bounds: {
         left: 0,
         top: 0,
@@ -57,19 +52,34 @@ export const player = {
         }
         
         this.updatePassability(grid);
-        console.log(this.currentCell.i, this.currentCell.j);
-        console.log(this.targetCell.i, this.targetCell.j, "\n", grid);
-
     },
 
-    moveRight: function (grid) {
+    move: function(direction, grid) {
         const playerRects = this.element.getBoundingClientRect();
 
-        if (playerRects.right + SPEED <= this.bounds.right) {
+        if (direction == "Right") {
+            this.moveRight(grid, playerRects)
+        } else if (direction == "Left") {
+            this.moveLeft(grid, playerRects)
+        } else if (direction == "Up") {
+            this.moveUp(grid, playerRects)
+        } else {
+            this.moveDown(grid, playerRects)
+        }
+        
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`
+        
+    },
+
+    moveRight: function (grid, playerRects) {
+        if (playerRects.right + SPEED <= this.bounds.right ) {
             this.position.x += SPEED;
         } else {
-            if (this.passablility.right /*&& grid[this.targetCell.i][this.targetCell.j+1]==0*/) {
+            if (this.currentCell.i == this.targetCell.i && this.passablility.right) {
                 this.position.x += SPEED;
+            }
+            if (this.passablility.right && grid[this.targetCell.i][this.targetCell.j+1] == 0) {
+                // this.position.x += SPEED;
             }
         }
 
@@ -78,24 +88,19 @@ export const player = {
             this.updateBounds(grid);
         }
 
+        // target cell
         if (playerRects.right > this.bounds.right && this.currentCell.j == this.targetCell.j) {
             this.targetCell.j = this.currentCell.j+1;
-            // this.targetCell.i = this.cell.i;
-            // console.log(this.targetCell);
+            console.log(this.targetCell);
+            
         }
-        // console.log("x=>", this.position.x,"y=>", this.position.y);
-        
-        this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-        animation.id = requestAnimationFrame(() => this.moveRight(grid))
     },
 
-    moveLeft: function (grid) {
-        const playerRects = this.element.getBoundingClientRect();
-
+    moveLeft: function (grid, playerRects) {
         if (playerRects.left - SPEED >= this.bounds.left) {
             this.position.x -= SPEED;
         } else {
-            if (this.passablility.left /*&& grid[this.targetCell.i][this.targetCell.j-1]==0*/) {
+            if (this.passablility.left) {
                 this.position.x -= SPEED;
             }
         }
@@ -107,18 +112,11 @@ export const player = {
 
         if (playerRects.left < this.bounds.left && this.currentCell.j == this.targetCell.j) {
             this.targetCell.j = this.currentCell.j-1;
-            // this.targetCell.i = this.cell.i;
-            // console.log(this.targetCell);
         }
-        // console.log("x=>", this.position.x,"y=>", this.position.y);
-        this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-        animation.id = requestAnimationFrame(() => this.moveLeft(grid))
     },
 
-    moveDown: function (grid) {
-        const playerRects = this.element.getBoundingClientRect();
-
-        if (playerRects.bottom + SPEED <= this.bounds.bottom /*&& grid[this.targetCell.i+1][this.targetCell.j]==0*/) {
+    moveDown: function (grid, playerRects) {
+        if (playerRects.bottom + SPEED <= this.bounds.bottom) {
             this.position.y += SPEED;
         } else {
             if (this.passablility.bottom) {
@@ -133,17 +131,11 @@ export const player = {
 
         if (playerRects.bottom > this.bounds.bottom && this.currentCell.i == this.targetCell.i) {
             this.targetCell.i = this.currentCell.i+1;
-            // this.targetCell.i = this.cell.i;
-            // console.log(this.targetCell);
+            console.log(this.targetCell);
         }
-
-        this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-        animation.id = requestAnimationFrame(() => this.moveDown(grid))
     },
 
-    moveUp: function (grid) {
-        const playerRects = this.element.getBoundingClientRect();
-
+    moveUp: function (grid, playerRects) {
         if (playerRects.top - SPEED >= this.bounds.top /*&& grid[this.targetCell.i-1][this.targetCell.j]==0*/) {
             this.position.y -= SPEED;
         } else {
@@ -159,11 +151,10 @@ export const player = {
 
         if (playerRects.top < this.bounds.top && this.currentCell.i == this.targetCell.i) {
             this.targetCell.i = this.currentCell.i-1;
-            // this.targetCell.i = this.cell.i;
-            // console.log(this.targetCell);
         }
-
-        this.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`
-        animation.id = requestAnimationFrame(() => this.moveUp(grid))
     },
 }
+
+
+
+

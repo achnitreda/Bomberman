@@ -1,14 +1,15 @@
 export const mapCells = {} // store theme whene they created and avoid quering DOM  evry time we need a cell
+export let gateCell = null;
 const mapWidth = 15;
 const mapHeight = 13;
 const empty = 0;
 const soft = 1;
 const solid = 2;
+const softs = []; // store soft blocks indexes to chose on random for the gate
 const randomNumber = () => (Math.random() < 0.6) ? empty : soft;
 
 function mapGrid() {
     const grid = [];
-
     for (let i = 0; i < mapHeight; i++) {
         grid[i] = [];
         for (let j = 0; j < mapWidth; j++) {
@@ -23,11 +24,20 @@ function mapGrid() {
                 grid[i][j] = solid;
             } else {
                 // random blocks either soft or empty 
-                grid[i][j] = randomNumber();
+                const rand = randomNumber();
+                grid[i][j] = rand;
+
+                // store soft blocks indexes
+                if (rand == soft) {
+                    softs.push([i,j])
+                }
             }
         }
     }
 
+    // random gate cell
+    gateCell = softs[Math.floor(Math.random() * softs.length)];
+    
     return grid;
 }
 
@@ -51,7 +61,6 @@ export function mapVisual(map, player) {
         })
     });
 
-    // player.updateNeighborCells(grid);
     player.updateBounds(grid);
     return grid;
 }

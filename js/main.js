@@ -1,56 +1,34 @@
-import { mapVisual } from "./map.js";
-import { player, animation } from "./player.js";
+import { mapVisual, gateCell } from "./map.js";
+import { player } from "./player.js";
+const movementkeys = [];
 const board = document.getElementById('board')
 const grid = mapVisual(board, player);
-// const keys = { ArrowRight: false, ArrowLeft: false, ArrowDown: false, ArrowUp: false };
 
 
-
-// console.log(player.neighborCells);
-
-
+function gameLoop() {
+    if (movementkeys[0] != undefined) {
+        player.move(movementkeys[0].slice(5), grid);
+    }
+    
+    requestAnimationFrame(gameLoop)
+}
 
 
 document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight") {
-        // keys[e.key] = true;
-        if (!animation.id) {
-            animation.id = requestAnimationFrame(() => player.moveRight(grid))
+    if (e.key == "ArrowUp" || e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "ArrowDown") {
+        if (!movementkeys.includes(e.key)) {
+            movementkeys.unshift(e.key)
         }
     }
-
-    if (e.key === "ArrowLeft") {
-        // keys[e.key] = true;
-        if (!animation.id) {
-            animation.id = requestAnimationFrame(() => player.moveLeft(grid))
-        }
-    }
-
-    if (e.key === "ArrowDown") {
-        // keys[e.key] = true;
-        if (!animation.id) {
-            animation.id = requestAnimationFrame(() => player.moveDown(grid))
-        }
-    }
-
-    if (e.key === "ArrowUp") {
-        // keys[e.key] = true;
-        if (!animation.id) {
-            animation.id = requestAnimationFrame(() => player.moveUp(grid))
-        }
-    }
-});
+})
 
 document.addEventListener("keyup", (e) => {
-    // if (keys[e.key] != undefined) {
-        // keys[e.key] = false;
-        // if (!Object.values(keys).some(Boolean)) {
-            cancelAnimationFrame(animation.id);
-            animation.id = null;
-        // }
-    // }
+    if (e.key == "ArrowUp" || e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "ArrowDown") {
+        movementkeys.splice(movementkeys.indexOf(e.key), 1)
+    }
+}) 
 
-})
+requestAnimationFrame(gameLoop)
 
 document.addEventListener("keypress", e => {
     if (e.key.toLowerCase() == 'z') {
@@ -64,7 +42,7 @@ document.addEventListener("keypress", e => {
         bombCell.appendChild(bomb);
         setTimeout(() => {
             const bombRight = document.getElementById(`cell${i}#${j + 1}`);
-            console.log(bombRight);
+            // console.log(bombRight);
 
             const bombLeft = document.getElementById(`cell${i}#${j - 1}`);
             const bombTop = document.getElementById(`cell${i - 1}#${j}`);
@@ -76,21 +54,33 @@ document.addEventListener("keypress", e => {
                 bombRight.classList.remove("softWall");
                 bombRight.classList.add("empty")
                 grid[i][j + 1] = 0;
+                if (i == gateCell[0] && j+1 == gateCell[1]) {
+                    bombRight.classList.add("gate") 
+                }
             }
             if (bombLeft.classList.contains("softWall")) {
                 bombLeft.classList.remove("softWall");
                 bombLeft.classList.add("empty")
                 grid[i][j - 1] = 0;
+                if (i == gateCell[0] && j-1 == gateCell[1]) {
+                    bombLeft.classList.add("gate") 
+                }
             }
             if (bombTop.classList.contains("softWall")) {
                 bombTop.classList.remove("softWall");
                 bombTop.classList.add("empty")
                 grid[i - 1][j] = 0;
+                if (i-1 == gateCell[0] && j == gateCell[1]) {
+                    bombTop.classList.add("gate") 
+                }
             }
             if (bombBottom.classList.contains("softWall")) {
                 bombBottom.classList.remove("softWall");
                 bombBottom.classList.add("empty")
                 grid[i + 1][j] = 0;
+                if (i+1 == gateCell[0] && j == gateCell[1]) {
+                    bombBottom.classList.add("gate") 
+                }
             }
             // player.updateNeighborCells(grid)
             bomb.remove()
@@ -113,7 +103,7 @@ document.addEventListener("keypress", e => {
                     
                     player.element.style.transform = `translate(${-player.position.x}px, ${player.position.y}px)`;
                     player.element.style.background = "aqua";
-                },200)
+                },1000)
 
             }
         }, 2000)
