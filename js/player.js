@@ -8,6 +8,7 @@ export let animation = {
 
 export const player = {
     element: document.getElementById("player"),
+    alive: true,
     currentCell: {
         i: 1,
         j: 1
@@ -38,23 +39,23 @@ export const player = {
     },
 
     updatePassability: function (grid) {
-        this.passablility.left = grid[this.currentCell.i][this.currentCell.j-1] == 0;
-        this.passablility.top = grid[this.currentCell.i-1][this.currentCell.j] == 0;
-        this.passablility.right = grid[this.currentCell.i][this.currentCell.j+1] == 0;
-        this.passablility.bottom = grid[this.currentCell.i+1][this.currentCell.j] == 0;
+        this.passablility.left = grid[this.currentCell.i][this.currentCell.j - 1] == 0;
+        this.passablility.top = grid[this.currentCell.i - 1][this.currentCell.j] == 0;
+        this.passablility.right = grid[this.currentCell.i][this.currentCell.j + 1] == 0;
+        this.passablility.bottom = grid[this.currentCell.i + 1][this.currentCell.j] == 0;
     },
 
     updateBounds: function (grid) {
         const playerCell = mapCells[`cell${this.currentCell.i}#${this.currentCell.j}`];
-        
+
         for (let bound in this.bounds) {
             this.bounds[bound] = playerCell.getBoundingClientRect()[bound];
         }
-        
+
         this.updatePassability(grid);
     },
 
-    move: function(direction, grid) {
+    move: function (direction, grid) {
         const playerRects = this.element.getBoundingClientRect();
 
         if (direction == "Right") {
@@ -66,91 +67,90 @@ export const player = {
         } else {
             this.moveDown(grid, playerRects)
         }
-        
+
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`
-        
+
     },
 
     moveRight: function (grid, playerRects) {
-        if (playerRects.right + SPEED <= this.bounds.right ) {
+
+        if (playerRects.right + SPEED <= this.bounds.right && this.alive) {
             this.position.x += SPEED;
         } else {
-            if (this.currentCell.i == this.targetCell.i && this.passablility.right) {
+            if (this.passablility.right && this.alive) {
                 this.position.x += SPEED;
-            }
-            if (this.passablility.right && grid[this.targetCell.i][this.targetCell.j+1] == 0) {
-                // this.position.x += SPEED;
             }
         }
 
-        if (playerRects.left+10 > this.bounds.right) {
+        if (playerRects.left + 10 > this.bounds.right) {
             this.currentCell.j++;
             this.updateBounds(grid);
         }
 
         // target cell
         if (playerRects.right > this.bounds.right && this.currentCell.j == this.targetCell.j) {
-            this.targetCell.j = this.currentCell.j+1;
-            console.log(this.targetCell);
-            
+            this.targetCell.j = this.currentCell.j + 1;
+
         }
     },
 
     moveLeft: function (grid, playerRects) {
-        if (playerRects.left - SPEED >= this.bounds.left) {
+        if (playerRects.left - SPEED >= this.bounds.left && this.alive) {
             this.position.x -= SPEED;
         } else {
-            if (this.passablility.left) {
+            if (this.passablility.left && this.alive) {
                 this.position.x -= SPEED;
             }
         }
 
-        if (playerRects.right-10 < this.bounds.left) {
+        if (playerRects.right - 10 < this.bounds.left) {
             this.currentCell.j--;
             this.updateBounds(grid);
         }
 
+        // target cell
         if (playerRects.left < this.bounds.left && this.currentCell.j == this.targetCell.j) {
-            this.targetCell.j = this.currentCell.j-1;
+            this.targetCell.j = this.currentCell.j - 1;
         }
     },
 
     moveDown: function (grid, playerRects) {
-        if (playerRects.bottom + SPEED <= this.bounds.bottom) {
+        if (playerRects.bottom + SPEED <= this.bounds.bottom && this.alive) {
             this.position.y += SPEED;
         } else {
-            if (this.passablility.bottom) {
+            if (this.passablility.bottom && this.alive) {
                 this.position.y += SPEED;
             }
         }
 
-        if (playerRects.top+10 > this.bounds.bottom) {
+        if (playerRects.top + 10 > this.bounds.bottom) {
             this.currentCell.i++;
             this.updateBounds(grid);
         }
-
+        
+        // target cell
         if (playerRects.bottom > this.bounds.bottom && this.currentCell.i == this.targetCell.i) {
-            this.targetCell.i = this.currentCell.i+1;
-            console.log(this.targetCell);
+            this.targetCell.i = this.currentCell.i + 1;
         }
     },
 
     moveUp: function (grid, playerRects) {
-        if (playerRects.top - SPEED >= this.bounds.top /*&& grid[this.targetCell.i-1][this.targetCell.j]==0*/) {
+        if (playerRects.top - SPEED >= this.bounds.top && this.alive) {
             this.position.y -= SPEED;
         } else {
-            if (this.passablility.top) {
+            if (this.passablility.top && this.alive) {
                 this.position.y -= SPEED;
             }
         }
 
-        if (playerRects.bottom-10 < this.bounds.top) {
+        if (playerRects.bottom - 10 < this.bounds.top) {
             this.currentCell.i--;
             this.updateBounds(grid);
         }
 
+        // target cell
         if (playerRects.top < this.bounds.top && this.currentCell.i == this.targetCell.i) {
-            this.targetCell.i = this.currentCell.i-1;
+            this.targetCell.i = this.currentCell.i - 1;
         }
     },
 }
