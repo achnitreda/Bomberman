@@ -1,5 +1,5 @@
 import { player } from "./player.js"
-import { gateCell } from "./map.js";
+import { gateCell, mapCells } from "./map.js";
 
 export const bomb = {
     element: null,
@@ -9,27 +9,45 @@ export const bomb = {
         j: 0
     },
 
-    bounds: {
+    neighbors: {
         right: null,
         left: null,
         bottom: null,
         top: null,
     },
 
-    updateBounds: function () {
-        this.bounds.right = [this.cell.i, this.cell.j + 1];
-        this.bounds.left = [this.cell.i, this.cell.j - 1];
-        this.bounds.bottom = [this.cell.i + 1, this.cell.j];
-        this.bounds.top = [this.cell.i - 1, this.cell.j]
+    sprite: {
+        width: 28,
+        frameCount: 5,
+        currentFrame: 0,
+        lastUpdate: 0,
+        animationSpeed: 100,
+    },
+
+    animate: function(currentTime) {
+        if (currentTime - this.sprite.lastUpdate > this.sprite.animationSpeed) {
+            this.sprite.currentFrame = (this.sprite.currentFrame + 1) % this.sprite.frameCount;
+            this.sprite.lastUpdate = currentTime;
+
+            const x = this.sprite.currentFrame * this.sprite.width;
+            this.element.style.backgroundPosition = `-${x}px 0px`;
+        }
+    },
+
+    updateNeighbors: function () {
+        this.neighbors.right = [this.cell.i, this.cell.j + 1];
+        this.neighbors.left = [this.cell.i, this.cell.j - 1];
+        this.neighbors.bottom = [this.cell.i + 1, this.cell.j];
+        this.neighbors.top = [this.cell.i - 1, this.cell.j]
     },
 
     create: function () {
         this.cell.i = player.currentCell.i;
         this.cell.j = player.currentCell.j;
-        this.updateBounds();
+        this.updateNeighbors();
 
 
-        const bombCell = document.getElementById(`cell${this.cell.i}#${this.cell.j}`);
+        const bombCell = mapCells[`cell${this.cell.i}#${this.cell.j}`];
         this.element = document.createElement("div");
         this.element.classList.add("bomb");
 
@@ -38,47 +56,44 @@ export const bomb = {
 
     explosion: function (grid) {
         setTimeout(() => {
-            for (let cellBounds in this.bounds) {
-                const [i, j] = this.bounds[cellBounds];
+            for (let neighbor in this.neighbors) {
+                const [i, j] = this.neighbors[neighbor];
                 if (grid[i][j] == 1) {
-                    const cell = document.getElementById(`cell${i}#${j}`);
-                    cell.classList.remove("softWall");
-                    cell.classList.add("empty");
+                    const cell = mapCells[`cell${i}#${j}`];
+                    cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
                     grid[i][j] = 0;
-                    if (i == gateCell[0] && j == gateCell[1]) {
-                        cell.classList.add("gate")
-                    }
                 }
             }
+
             playerDeath(grid);
             this.element.remove();
             this.exist = false;
-        }, 3000)
+        }, 2500)
     },
 }
 
 function playerDeath(grid) {
-    for (let cellBounds in bomb.bounds) {
-        const [i, j] = bomb.bounds[cellBounds];
+    for (let cellBounds in bomb.neighbors) {
+        const [i, j] = bomb.neighbors[cellBounds];
         if (player.currentCell.i == i && player.currentCell.j == j ||
             player.currentCell.i == bomb.cell.i && player.currentCell.j == bomb.cell.j
         ) {
             player.alive = false;
-            player.element.style.background = "red";
+            // player.element.style.background = "red";
+            player.position.x -= player.position.x;
+            player.position.y -= player.position.y;
             setTimeout(() => {
                 // send to initial position
                 player.alive = true;
-                player.position.x -= player.position.x;
-                player.position.y -= player.position.y;
                 player.currentCell.i = 1;
                 player.currentCell.j = 1;
                 player.targetCell.i = 1;
                 player.targetCell.j = 1;
-                player.updateBounds(grid)
+                player.updateBounds(grid);
 
                 player.element.style.transform = `translate(${-player.position.x}px, ${player.position.y}px)`;
-                player.element.style.background = "aqua";
-            }, 2000)
+                // player.element.style.background = "aqua";
+            }, 1500)
             break;
         }
     }

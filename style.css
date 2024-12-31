@@ -26,6 +26,8 @@ body {
 
 .empty {
     background-color: rgb(3, 168, 113);
+    /* background-image: url('./enemie.png'); */
+    /* background-size:18px 27px ; */
 }
 
 .solidWall {
@@ -39,20 +41,23 @@ body {
 .bomb {
     width: 28px;
     height: 28px;
-    border-radius: 50px;
-    background-color: black;
+    background-image: url('./bomb.png');
     transform: translate(6px, 6px);
+}
+
+.enimie {
+    width: 18px;
+    height: 25px;
+    background-color: blue;
 }
 
 #player {
     position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: aqua;
-    /* background-image: url(./character.png); */
-    /* background-size:cover ; */
-    /* background-position: 100 0; */
-    top: 50px;
+    width: 27px;
+    height: 40px;
+    background-image: url('./bomberman.png');
+    background-position: 0px 0px;
+    top: 40px;
     left: 50px;
     z-index: 10;
 }

@@ -1,12 +1,36 @@
-export const mapCells = {} // store theme whene they created and avoid quering DOM  evry time we need a cell
+import { enimie, enimiesNumber } from "./enimies.js";
+
+export const mapCells = {}; // store theme whene they created and avoid quering DOM  evry time we need a cell
+export const enimieCells = [];
 export let gateCell = null;
+// const bomberman = new Image();
 const mapWidth = 15;
 const mapHeight = 13;
 const empty = 0;
 const soft = 1;
 const solid = 2;
 const softs = []; // store soft blocks indexes to chose on random for the gate
+const enimies = []
 const randomNumber = () => (Math.random() < 0.6) ? empty : soft;
+function getRandomIndexes() {
+    const nums = new Set();
+    while(nums.size < enimiesNumber) {
+        nums.add(Math.floor(Math.random() * enimieCells.length));
+    }
+    return Array.from(nums);
+}
+
+function addEnimies () {
+    getRandomIndexes().forEach((el) => {
+        const [i, j] = enimieCells[el];
+        const $enimie = new enimie();
+        $enimie.create(i, j);
+        enimies.push($enimie)
+    })
+
+    console.log(enimies);
+    
+}
 
 function mapGrid() {
     const grid = [];
@@ -29,7 +53,7 @@ function mapGrid() {
 
                 // store soft blocks indexes
                 if (rand == soft) {
-                    softs.push([i,j])
+                    softs.push([i, j])
                 }
             }
         }
@@ -37,13 +61,15 @@ function mapGrid() {
 
     // random gate cell
     gateCell = softs[Math.floor(Math.random() * softs.length)];
-    console.log(gateCell);
-    
+    // console.log(gateCell);
+
     return grid;
 }
 
 export function mapVisual(map, player) {
     const grid = mapGrid();
+    console.log(grid)
+    let enimieAdded = 0;
     grid.forEach((row, i) => {
         row.forEach((el, j) => {
             const cell = document.createElement('div');
@@ -54,6 +80,9 @@ export function mapVisual(map, player) {
                 cell.classList.add('softWall')
             } else {
                 cell.classList.add('empty')
+                if (i > 2) {
+                    enimieCells.push([i, j])
+                }
             }
 
             cell.id = `cell${i}#${j}`
@@ -62,6 +91,7 @@ export function mapVisual(map, player) {
         })
     });
 
+    addEnimies()
     player.updateBounds(grid);
     return grid;
 }
