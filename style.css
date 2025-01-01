@@ -53,12 +53,13 @@ body {
 
 #player {
     position: absolute;
-    width: 27px;
-    height: 40px;
+    width: 26px;
+    height: 28px;
+    /* background-color: aqua; */
     background-image: url('./bomberman.png');
     background-position: 0px 0px;
-    top: 40px;
-    left: 50px;
+    background-size: 104px 112px;
+    transform: translate(47px, 46px);
     z-index: 10;
 }
 

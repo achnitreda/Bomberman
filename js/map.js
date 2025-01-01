@@ -26,9 +26,9 @@ function addEnimies () {
         const $enimie = new enimie();
         $enimie.create(i, j);
         enimies.push($enimie)
+        // console.log($enimie.direction);
     })
 
-    console.log(enimies);
     
 }
 
@@ -68,8 +68,8 @@ function mapGrid() {
 
 export function mapVisual(map, player) {
     const grid = mapGrid();
-    console.log(grid)
-    let enimieAdded = 0;
+    // console.log(grid)
+    // let enimieAdded = 0;
     grid.forEach((row, i) => {
         row.forEach((el, j) => {
             const cell = document.createElement('div');
@@ -92,7 +92,12 @@ export function mapVisual(map, player) {
     });
 
     addEnimies()
-    player.updateBounds(grid);
+    player.oneBoxBounds(grid);
+    console.log(player.bounds);
+    console.log(player.passablility);
+    
+    
+    // player.updatePassability(grid, 1);
     return grid;
 }
 

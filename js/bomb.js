@@ -5,8 +5,8 @@ export const bomb = {
     element: null,
     exist: false,
     cell: {
-        i: 0,
-        j: 0
+        i: 1,
+        j: 1
     },
 
     neighbors: {
@@ -42,8 +42,8 @@ export const bomb = {
     },
 
     create: function () {
-        this.cell.i = player.currentCell.i;
-        this.cell.j = player.currentCell.j;
+        // this.cell.i = player.currentCell.i;
+        // this.cell.j = player.currentCell.j;
         this.updateNeighbors();
 
 
