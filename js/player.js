@@ -1,5 +1,5 @@
 import { mapCells } from "./map.js";
-const SPEED = 2;
+const SPEED = 1.5;
 
 
 export let animation = {
@@ -30,6 +30,8 @@ export const player = {
         nb: 1,
         axis: null
     },
+    
+    update: false,
 
     passablility: {
         left: false,
@@ -70,58 +72,58 @@ export const player = {
         this.bounds.top = Math.floor(this.position.y / 40) * 40;
         this.bounds.right = Math.ceil(this.position.x / 40) * 40;
         this.bounds.bottom = Math.ceil(this.position.y / 40) * 40;
+
         this.passabilityInOneBox(grid);
-        // console.log(this.bounds);
     },
 
     passabilityInOneBox: function (grid) {
-        const i = Math.floor(this.position.y/40);
-        const j = Math.floor(this.position.x/40);
-        this.passablility.left = grid[i][j-1] == 0;
-        this.passablility.right = grid[i][j+1] == 0;
-        this.passablility.top = grid[i-1][j] == 0;
-        this.passablility.bottom = grid[i+1][j] == 0;
+        const i = Math.floor(this.position.y / 40);
+        const j = Math.floor(this.position.x / 40);
+
+        this.passablility.left = grid[i][j - 1] == 0;
+        this.passablility.right = grid[i][j + 1] == 0;
+        this.passablility.top = grid[i - 1][j] == 0;
+        this.passablility.bottom = grid[i + 1][j] == 0;
     },
 
     towBoxesBoundsHoriz: function (grid) {
         this.bounds.left = Math.floor(this.position.x / 40) * 40;
         this.bounds.top = Math.floor(this.position.y / 40) * 40
-        this.bounds.right = Math.ceil((this.position.x/ 40)+1) * 40;
+        this.bounds.right = Math.ceil((this.position.x / 40) + 1) * 40;
         this.bounds.bottom = Math.ceil(this.position.y / 40) * 40;
 
         this.passabilityIntowBoxesHoriz(grid);
     },
 
-    passabilityIntowBoxesHoriz: function(grid) {
-        const i = Math.floor(this.position.y/40);
-        const j = Math.floor(this.position.x/40);
+    passabilityIntowBoxesHoriz: function (grid) {
+        const i = Math.floor(this.position.y / 40);
+        const j = Math.floor(this.position.x / 40);
 
-        this.passablility.left = grid[i][j-1] == 0;
-        this.passablility.right = grid[i][j+2] == 0;
-        this.passablility.top = grid[i-1][j] == 0 && grid[i-1][j+1] == 0;
-        this.passablility.bottom = grid[i+1][j] == 0 && grid[i+1][j+1] == 0;
+        this.passablility.left = grid[i][j - 1] == 0;
+        this.passablility.right = grid[i][j + 2] == 0;
+        this.passablility.top = grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0;
+        this.passablility.bottom = grid[i + 1][j] == 0 && grid[i + 1][j + 1] == 0;
     },
 
     towBoxesBoundsVert: function (grid) {
         this.bounds.left = Math.floor(this.position.x / 40) * 40;
         this.bounds.top = Math.floor(this.position.y / 40) * 40;
         this.bounds.right = Math.ceil(this.position.x / 40) * 40;
-        this.bounds.bottom = Math.ceil((this.position.y/ 40)+1) * 40;
+        this.bounds.bottom = Math.ceil((this.position.y / 40) + 1) * 40;
         this.passabilityIntowBoxesVert(grid);
-        
-        
+
+
     },
 
-    passabilityIntowBoxesVert: function(grid) {
-        const i = Math.floor(this.position.y/40);
-        const j = Math.floor(this.position.x/40);
+    passabilityIntowBoxesVert: function (grid) {
+        const i = Math.floor(this.position.y / 40);
+        const j = Math.floor(this.position.x / 40);
 
-        this.passablility.top = grid[i-1][j] == 0;
-        this.passablility.bottom = grid[i+2][j] == 0;
-        this.passablility.left = grid[i][j-1] == 0 && grid[i+1][j+1] == 0;
-        this.passablility.right = grid[i+1][j-1] == 0 && grid[i+1][j+1] == 0;
+        this.passablility.top = grid[i - 1][j] == 0;
+        this.passablility.bottom = grid[i + 2][j] == 0;
+        this.passablility.left = grid[i][j - 1] == 0 && grid[i + 1][j + 1] == 0;
+        this.passablility.right = grid[i + 1][j - 1] == 0 && grid[i + 1][j + 1] == 0;
     },
-
 
     move: function (direction, grid) {
         const playerRects = this.element.getBoundingClientRect();
@@ -136,90 +138,71 @@ export const player = {
             this.moveDown(grid, playerRects)
         }
 
-        if (((this.position.x + 26 <= (Math.ceil(this.position.x / 40)) * 40) && this.position.x >= (Math.floor(this.position.x / 40)) * 40) && 
-            ((this.position.y + 28 <= (Math.ceil(this.position.y / 40)) * 40) && this.position.y >= (Math.floor(this.position.y / 40)) * 40)) {
-                // console.log("x");
+        if (((this.position.x + 26 <= (Math.ceil(this.position.x / 40)) * 40) && this.position.x >= (Math.floor(this.position.x / 40)) * 40) &&
+            ((this.position.y + 28 <= (Math.ceil(this.position.y / 40)) * 40) && this.position.y >= (Math.floor(this.position.y / 40)) * 40) && !this.update) {
+                console.log("x");
                 
-                this.oneBoxBounds(grid)
+                // this.update = false;
+                this.oneBoxBounds(grid);
+        } else {
+            // this.update = true;
         }
 
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
+        this.currentCell.j = Math.floor((this.position.x + 13) / 40);
+        this.currentCell.i = Math.floor((this.position.y + 14) / 40);
+        // console.log(this.currentCell);
+        
+        
     },
 
     moveRight: function (grid, playerRects) {
-        if ((this.position.x+27) + SPEED <= this.bounds.right && this.alive) {
+        if ((this.position.x + 26) + SPEED <= this.bounds.right && this.alive) {
+            this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
             this.position.x += SPEED;
         } else {
             if (this.passablility.right && this.alive) {
+                this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
                 this.position.x += SPEED;
-                this.towBoxesBoundsHoriz(grid);
-                // console.log(this.bounds, this.passablility);
             }
         }
-
-        // c
-        // if (playerRects.left + 12 > this.bounds.right) {
-        //     this.currentCell.j++;
-        //     // this.updateBounds(grid);
-        // }
     },
 
     moveLeft: function (grid, playerRects) {
         if (this.position.x - SPEED >= this.bounds.left && this.alive) {
+            this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
             this.position.x -= SPEED;
         } else {
             if (this.passablility.left && this.alive) {
+                this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
                 this.position.x -= SPEED;
-                this.towBoxesBoundsHoriz(grid);
-                // console.log(this.bounds, this.passablility);
-                
             }
         }
-
-        // if (playerRects.right - 13 < this.bounds.left) {
-        //     this.currentCell.j--;
-        //     // this.updateBounds(grid);
-        // }
-
     },
 
     moveDown: function (grid, playerRects) {
-        if (this.position.y+ 28 + SPEED <= this.bounds.bottom && this.alive) {
+
+        if (this.position.y + 28 + SPEED <= this.bounds.bottom && this.alive) {
+            this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
             this.position.y += SPEED;
         } else {
             if (this.passablility.bottom && this.alive) {
+                this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
                 this.position.y += SPEED;
-                // console.log(this.position.y);
-                
-                this.towBoxesBoundsVert(grid);
-                // console.log(this.passablility, this.bounds);
-                
             }
         }
-
-        // if (playerRects.top + 20 > this.bounds.bottom) {
-        //     this.currentCell.i++;
-        //     this.updateBounds(grid);
-        // }
-
-
     },
 
     moveUp: function (grid, playerRects) {
         if (this.position.y - SPEED >= this.bounds.top && this.alive) {
+            this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
             this.position.y -= SPEED;
         } else {
             if (this.passablility.top && this.alive) {
-                // this.position.x = Math.round(this.position.x/40)*40
+                this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
                 this.position.y -= SPEED;
-                this.towBoxesBoundsVert(grid)
             }
         }
-
-        // if (playerRects.bottom - 20 < this.bounds.top) {
-        //     this.currentCell.i--;
-        //     this.updateBounds(grid);
-        // }
     },
 
 }

@@ -46,9 +46,12 @@ body {
 }
 
 .enimie {
-    width: 18px;
-    height: 25px;
-    background-color: blue;
+    width: 17px;
+    height: 17px;
+    /* background-color: blue; */
+    background-image: url('./enimie.png');
+    /* background-size: 104px 112px; */
+    transform: translate(11.5px, 11.5px);
 }
 
 #player {

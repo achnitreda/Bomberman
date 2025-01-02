@@ -10,7 +10,7 @@ const empty = 0;
 const soft = 1;
 const solid = 2;
 const softs = []; // store soft blocks indexes to chose on random for the gate
-const enimies = []
+export const enimies = []
 const randomNumber = () => (Math.random() < 0.6) ? empty : soft;
 function getRandomIndexes() {
     const nums = new Set();
@@ -20,13 +20,16 @@ function getRandomIndexes() {
     return Array.from(nums);
 }
 
-function addEnimies () {
+function addEnimies (grid) {
     getRandomIndexes().forEach((el) => {
         const [i, j] = enimieCells[el];
         const $enimie = new enimie();
         $enimie.create(i, j);
+        $enimie.updatPassability(grid);
+        console.log($enimie.passability);
+        
         enimies.push($enimie)
-        // console.log($enimie.direction);
+        // console.log($enimie.bounds);
     })
 
     
@@ -62,6 +65,8 @@ function mapGrid() {
     // random gate cell
     gateCell = softs[Math.floor(Math.random() * softs.length)];
     // console.log(gateCell);
+    
+    // console.log(gateCell);
 
     return grid;
 }
@@ -80,7 +85,7 @@ export function mapVisual(map, player) {
                 cell.classList.add('softWall')
             } else {
                 cell.classList.add('empty')
-                if (i > 2) {
+                if (i >= 2 && j>1 && (i+1)%2 == 0 && (j+1)%2== 0) {
                     enimieCells.push([i, j])
                 }
             }
@@ -91,13 +96,8 @@ export function mapVisual(map, player) {
         })
     });
 
-    addEnimies()
+    addEnimies(grid);
     player.oneBoxBounds(grid);
-    console.log(player.bounds);
-    console.log(player.passablility);
-    
-    
-    // player.updatePassability(grid, 1);
     return grid;
 }
 

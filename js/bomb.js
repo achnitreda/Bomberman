@@ -42,8 +42,8 @@ export const bomb = {
     },
 
     create: function () {
-        // this.cell.i = player.currentCell.i;
-        // this.cell.j = player.currentCell.j;
+        this.cell.i = player.currentCell.i;
+        this.cell.j = player.currentCell.j;
         this.updateNeighbors();
 
 
@@ -68,7 +68,7 @@ export const bomb = {
             playerDeath(grid);
             this.element.remove();
             this.exist = false;
-        }, 2500)
+        }, 1300)
     },
 }
 
@@ -79,25 +79,19 @@ function playerDeath(grid) {
             player.currentCell.i == bomb.cell.i && player.currentCell.j == bomb.cell.j
         ) {
             player.alive = false;
-            // player.element.style.background = "red";
-            player.position.x -= player.position.x;
-            player.position.y -= player.position.y;
+            console.log(player.position);
+            player.position.x = -(player.position.x-47);
+            player.position.y = -(player.position.y-46);
             setTimeout(() => {
                 // send to initial position
                 player.alive = true;
                 player.currentCell.i = 1;
                 player.currentCell.j = 1;
-                player.targetCell.i = 1;
-                player.targetCell.j = 1;
-                player.updateBounds(grid);
-
-                player.element.style.transform = `translate(${-player.position.x}px, ${player.position.y}px)`;
-                // player.element.style.background = "aqua";
-            }, 1500)
-            break;
+                // player.oneBoxBounds(grid);  
+                
+                player.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`;
+            }, 1000)
+            break;  
         }
-    }
-    if (player.alive) {
-        player.updateBounds(grid)
     }
 }

@@ -1,4 +1,4 @@
-import { gateCell, mapVisual } from "./map.js";
+import { enimies, gateCell, mapVisual } from "./map.js";
 import { player } from "./player.js";
 import { bomb } from "./bomb.js";
 const board = document.getElementById('board')
@@ -24,7 +24,13 @@ function gameLoop(time) {
     if (bomb.exist) {
         bomb.animate(time)
     }
-
+    if (enimies.length == 3) {
+        enimies.forEach(enimie => {
+            // console.log(enimie.axis);
+            enimie.move(grid);
+            enimie.animate(time);
+        })
+    }
     requestAnimationFrame(gameLoop)
 }
 
