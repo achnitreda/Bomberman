@@ -1,6 +1,7 @@
 import { enimies, gateCell, mapVisual } from "./map.js";
-import { player } from "./player.js";
+import { player, urgentMove } from "./player.js";
 import { bomb } from "./bomb.js";
+import { enimiesNumber } from "./enimies.js";
 const board = document.getElementById('board')
 const grid = mapVisual(board, player);
 const movementkeys = [];
@@ -10,8 +11,8 @@ let placeBombe = false;
 function gameLoop(time) {
 
     if (movementkeys[0] != undefined) {
-        player.move(movementkeys[0].slice(5), grid);
-        player.animation(time, movementkeys[0].slice(5));
+        player.move(urgentMove || movementkeys[0].slice(5), grid);
+        player.animation(time, urgentMove || movementkeys[0].slice(5));
     }
 
     if (placeBombe && (player.currentCell.i != gateCell[0] || player.currentCell.j != gateCell[1])) {
@@ -24,15 +25,16 @@ function gameLoop(time) {
     if (bomb.exist) {
         bomb.animate(time)
     }
-    if (enimies.length == 3) {
+    if (enimies.length == enimiesNumber) {
         enimies.forEach(enimie => {
-            // console.log(enimie.axis);
+            //
             enimie.move(grid);
             enimie.animate(time);
         })
     }
     requestAnimationFrame(gameLoop)
 }
+
 
 
 document.addEventListener("keydown", (e) => {

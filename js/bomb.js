@@ -4,10 +4,7 @@ import { gateCell, mapCells } from "./map.js";
 export const bomb = {
     element: null,
     exist: false,
-    cell: {
-        i: 1,
-        j: 1
-    },
+    cell: null,
 
     neighbors: {
         right: null,
@@ -24,7 +21,7 @@ export const bomb = {
         animationSpeed: 100,
     },
 
-    animate: function(currentTime) {
+    animate: function (currentTime) {
         if (currentTime - this.sprite.lastUpdate > this.sprite.animationSpeed) {
             this.sprite.currentFrame = (this.sprite.currentFrame + 1) % this.sprite.frameCount;
             this.sprite.lastUpdate = currentTime;
@@ -42,8 +39,7 @@ export const bomb = {
     },
 
     create: function () {
-        this.cell.i = player.currentCell.i;
-        this.cell.j = player.currentCell.j;
+        this.cell = {i: player.currentCell.i, j: player.currentCell.j}
         this.updateNeighbors();
 
 
@@ -66,6 +62,7 @@ export const bomb = {
             }
 
             playerDeath(grid);
+            bomb.cell = null;
             this.element.remove();
             this.exist = false;
         }, 1300)
@@ -79,19 +76,15 @@ function playerDeath(grid) {
             player.currentCell.i == bomb.cell.i && player.currentCell.j == bomb.cell.j
         ) {
             player.alive = false;
-            console.log(player.position);
-            player.position.x = -(player.position.x-47);
-            player.position.y = -(player.position.y-46);
+            player.position.x = 47;
+            player.position.y = 46;
+            player.currentCell.i = 1;
+            player.currentCell.j = 1;
             setTimeout(() => {
-                // send to initial position
                 player.alive = true;
-                player.currentCell.i = 1;
-                player.currentCell.j = 1;
-                // player.oneBoxBounds(grid);  
-                
                 player.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`;
             }, 1000)
-            break;  
+            break;
         }
     }
 }

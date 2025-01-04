@@ -39,6 +39,7 @@ body {
 }
 
 .bomb {
+    position: absolute;
     width: 28px;
     height: 28px;
     background-image: url('./bomb.png');

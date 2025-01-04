@@ -1,5 +1,6 @@
-import { mapCells } from "./map.js";
-const SPEED = 1.5;
+// player should be bigger!!!!!!
+const SPEED = 2;
+export let urgentMove = "";
 
 
 export let animation = {
@@ -16,7 +17,7 @@ export const player = {
 
     position: {
         x: 47,
-        y: 42
+        y: 46
     },
 
     bounds: {
@@ -26,11 +27,6 @@ export const player = {
         bottom: 0,
     },
 
-    boxes: {
-        nb: 1,
-        axis: null
-    },
-    
     update: false,
 
     passablility: {
@@ -46,7 +42,7 @@ export const player = {
         currentFrame: 0,
         frameCount: 4,
         lastUpdate: 0,
-        animationSpeed: 95,
+        animationSpeed: 75,
         direction: {
             down: 0,
             left: 28,
@@ -86,44 +82,7 @@ export const player = {
         this.passablility.bottom = grid[i + 1][j] == 0;
     },
 
-    towBoxesBoundsHoriz: function (grid) {
-        this.bounds.left = Math.floor(this.position.x / 40) * 40;
-        this.bounds.top = Math.floor(this.position.y / 40) * 40
-        this.bounds.right = Math.ceil((this.position.x / 40) + 1) * 40;
-        this.bounds.bottom = Math.ceil(this.position.y / 40) * 40;
 
-        this.passabilityIntowBoxesHoriz(grid);
-    },
-
-    passabilityIntowBoxesHoriz: function (grid) {
-        const i = Math.floor(this.position.y / 40);
-        const j = Math.floor(this.position.x / 40);
-
-        this.passablility.left = grid[i][j - 1] == 0;
-        this.passablility.right = grid[i][j + 2] == 0;
-        this.passablility.top = grid[i - 1][j] == 0 && grid[i - 1][j + 1] == 0;
-        this.passablility.bottom = grid[i + 1][j] == 0 && grid[i + 1][j + 1] == 0;
-    },
-
-    towBoxesBoundsVert: function (grid) {
-        this.bounds.left = Math.floor(this.position.x / 40) * 40;
-        this.bounds.top = Math.floor(this.position.y / 40) * 40;
-        this.bounds.right = Math.ceil(this.position.x / 40) * 40;
-        this.bounds.bottom = Math.ceil((this.position.y / 40) + 1) * 40;
-        this.passabilityIntowBoxesVert(grid);
-
-
-    },
-
-    passabilityIntowBoxesVert: function (grid) {
-        const i = Math.floor(this.position.y / 40);
-        const j = Math.floor(this.position.x / 40);
-
-        this.passablility.top = grid[i - 1][j] == 0;
-        this.passablility.bottom = grid[i + 2][j] == 0;
-        this.passablility.left = grid[i][j - 1] == 0 && grid[i + 1][j + 1] == 0;
-        this.passablility.right = grid[i + 1][j - 1] == 0 && grid[i + 1][j + 1] == 0;
-    },
 
     move: function (direction, grid) {
         const playerRects = this.element.getBoundingClientRect();
@@ -140,69 +99,105 @@ export const player = {
 
         if (((this.position.x + 26 <= (Math.ceil(this.position.x / 40)) * 40) && this.position.x >= (Math.floor(this.position.x / 40)) * 40) &&
             ((this.position.y + 28 <= (Math.ceil(this.position.y / 40)) * 40) && this.position.y >= (Math.floor(this.position.y / 40)) * 40) && !this.update) {
-                console.log("x");
-                
-                // this.update = false;
                 this.oneBoxBounds(grid);
-        } else {
-            // this.update = true;
         }
 
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
+
+        // player cell
         this.currentCell.j = Math.floor((this.position.x + 13) / 40);
         this.currentCell.i = Math.floor((this.position.y + 14) / 40);
-        // console.log(this.currentCell);
-        
-        
+
+
     },
 
-    moveRight: function (grid, playerRects) {
+    moveRight: function () {
+        const targetY = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+        const targetX = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+
+        if (targetY != this.position.y) {
+            urgentMove = (targetY > this.position.y) ? "Down" : "Up";
+            return
+        }
+
+
+
         if ((this.position.x + 26) + SPEED <= this.bounds.right && this.alive) {
-            this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+            // this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
             this.position.x += SPEED;
         } else {
             if (this.passablility.right && this.alive) {
-                this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+                // this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
                 this.position.x += SPEED;
             }
         }
+
+        if (urgentMove && this.position.x == targetX) urgentMove = "";
     },
 
-    moveLeft: function (grid, playerRects) {
+    moveLeft: function () {
+        const targetY = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+        const targetX = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+        if (targetY != this.position.y) {
+            urgentMove = (targetY > this.position.y) ? "Down" : "Up";
+            return
+        }
+
+
         if (this.position.x - SPEED >= this.bounds.left && this.alive) {
-            this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+            // this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
             this.position.x -= SPEED;
         } else {
             if (this.passablility.left && this.alive) {
-                this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+                // this.position.y = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
                 this.position.x -= SPEED;
             }
         }
+
+        if (urgentMove && this.position.x == targetX) urgentMove = "";
     },
 
-    moveDown: function (grid, playerRects) {
+    moveDown: function () {
+        const targetY = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+        const targetX = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+        if (targetX != this.position.x) {
+            urgentMove = (targetX > this.position.x) ? "Right" : "Left";
+            return
+        }
 
-        if (this.position.y + 28 + SPEED <= this.bounds.bottom && this.alive) {
-            this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+
+        if (this.position.y + 26 + SPEED <= this.bounds.bottom && this.alive) {
+            // this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
             this.position.y += SPEED;
         } else {
             if (this.passablility.bottom && this.alive) {
-                this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+                // this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
                 this.position.y += SPEED;
             }
         }
+
+        if (urgentMove && this.position.y == targetY) urgentMove = "";
     },
 
-    moveUp: function (grid, playerRects) {
+    moveUp: function () {
+        const targetY = (Math.floor((this.position.y + 14) / 40) * 40) + 6;
+        const targetX = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+        if (targetX != this.position.x) {
+            urgentMove = (targetX > this.position.x) ? "Right" : "Left";
+            return
+        }
+
         if (this.position.y - SPEED >= this.bounds.top && this.alive) {
-            this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+            // this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
             this.position.y -= SPEED;
         } else {
             if (this.passablility.top && this.alive) {
-                this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
+                // this.position.x = (Math.floor((this.position.x + 13) / 40) * 40) + 7;
                 this.position.y -= SPEED;
             }
         }
+
+        if (urgentMove && this.position.y == targetY) urgentMove = "";
     },
 
 }

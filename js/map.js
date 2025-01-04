@@ -14,6 +14,8 @@ export const enimies = []
 const randomNumber = () => (Math.random() < 0.6) ? empty : soft;
 function getRandomIndexes() {
     const nums = new Set();
+    console.log(enimieCells);
+    
     while(nums.size < enimiesNumber) {
         nums.add(Math.floor(Math.random() * enimieCells.length));
     }
@@ -26,12 +28,17 @@ function addEnimies (grid) {
         const $enimie = new enimie();
         $enimie.create(i, j);
         $enimie.updatPassability(grid);
-        console.log($enimie.passability);
+        // console.log($enimie.passability);
         
         enimies.push($enimie)
         // console.log($enimie.bounds);
     })
 
+    // setInterval(()=> {
+    //     enimies.forEach(enimie => {
+    //         enimie.axis *= -1;
+    //     })
+    // }, 1000)
     
 }
 
