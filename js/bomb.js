@@ -1,5 +1,5 @@
 import { player } from "./player.js"
-import { gateCell, mapCells } from "./map.js";
+import { gateCell, mapCells, enimies } from "./map.js";
 
 export const bomb = {
     element: null,
@@ -35,11 +35,11 @@ export const bomb = {
         this.neighbors.right = [this.cell.i, this.cell.j + 1];
         this.neighbors.left = [this.cell.i, this.cell.j - 1];
         this.neighbors.bottom = [this.cell.i + 1, this.cell.j];
-        this.neighbors.top = [this.cell.i - 1, this.cell.j]
+        this.neighbors.top = [this.cell.i - 1, this.cell.j];
     },
 
     create: function () {
-        this.cell = {i: player.currentCell.i, j: player.currentCell.j}
+        this.cell = { i: player.currentCell.i, j: player.currentCell.j }
         this.updateNeighbors();
 
 
@@ -54,37 +54,32 @@ export const bomb = {
         setTimeout(() => {
             for (let neighbor in this.neighbors) {
                 const [i, j] = this.neighbors[neighbor];
+
+                // breackable walls 
                 if (grid[i][j] == 1) {
                     const cell = mapCells[`cell${i}#${j}`];
                     cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
                     grid[i][j] = 0;
                 }
+
+                //player
+                if ((player.currentCell.i == i && player.currentCell.j == j) || (player.currentCell.i == bomb.cell.i && player.currentCell.j == bomb.cell.j)) {
+                    player.death();
+                }
+
+                // enimies 
+                enimies.forEach((enimy, index) => {
+                    if (enimy.cell.i == i && enimy.cell.j == j) {
+                        enimies.splice(index, 1);
+                        enimy.element.remove();
+                    }
+                })
             }
 
-            playerDeath(grid);
             bomb.cell = null;
             this.element.remove();
             this.exist = false;
-        }, 1300)
+        }, 1500)
     },
 }
 
-function playerDeath(grid) {
-    for (let cellBounds in bomb.neighbors) {
-        const [i, j] = bomb.neighbors[cellBounds];
-        if (player.currentCell.i == i && player.currentCell.j == j ||
-            player.currentCell.i == bomb.cell.i && player.currentCell.j == bomb.cell.j
-        ) {
-            player.alive = false;
-            player.position.x = 47;
-            player.position.y = 46;
-            player.currentCell.i = 1;
-            player.currentCell.j = 1;
-            setTimeout(() => {
-                player.alive = true;
-                player.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`;
-            }, 1000)
-            break;
-        }
-    }
-}

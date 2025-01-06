@@ -3,7 +3,8 @@ import { enimie, enimiesNumber } from "./enimies.js";
 export const mapCells = {}; // store theme whene they created and avoid quering DOM  evry time we need a cell
 export const enimieCells = [];
 export let gateCell = null;
-// const bomberman = new Image();
+export const cellWidth = 40;
+export const cellHeight = 40;
 const mapWidth = 15;
 const mapHeight = 13;
 const empty = 0;
@@ -14,7 +15,6 @@ export const enimies = []
 const randomNumber = () => (Math.random() < 0.6) ? empty : soft;
 function getRandomIndexes() {
     const nums = new Set();
-    console.log(enimieCells);
     
     while(nums.size < enimiesNumber) {
         nums.add(Math.floor(Math.random() * enimieCells.length));
@@ -34,11 +34,7 @@ function addEnimies (grid) {
         // console.log($enimie.bounds);
     })
 
-    // setInterval(()=> {
-    //     enimies.forEach(enimie => {
-    //         enimie.axis *= -1;
-    //     })
-    // }, 1000)
+    // enimies[0].animieCollision(enimies)  
     
 }
 

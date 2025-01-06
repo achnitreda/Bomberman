@@ -47,6 +47,7 @@ body {
 }
 
 .enimie {
+    position: absolute;
     width: 17px;
     height: 17px;
     /* background-color: blue; */

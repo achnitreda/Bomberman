@@ -25,9 +25,10 @@ function gameLoop(time) {
     if (bomb.exist) {
         bomb.animate(time)
     }
-    if (enimies.length == enimiesNumber) {
+    if (enimies.length != 0) {
         enimies.forEach(enimie => {
             //
+            
             enimie.move(grid);
             enimie.animate(time);
         })

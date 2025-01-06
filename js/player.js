@@ -1,3 +1,5 @@
+import { enimies } from "./map.js";
+
 // player should be bigger!!!!!!
 const SPEED = 2;
 export let urgentMove = "";
@@ -107,7 +109,7 @@ export const player = {
         // player cell
         this.currentCell.j = Math.floor((this.position.x + 13) / 40);
         this.currentCell.i = Math.floor((this.position.y + 14) / 40);
-
+        this.enimyColision();
 
     },
 
@@ -200,6 +202,23 @@ export const player = {
         if (urgentMove && this.position.y == targetY) urgentMove = "";
     },
 
+    death: function() {
+        player.alive = false;
+        player.position.x = 47;
+        player.position.y = 46;
+        player.currentCell.i = 1;
+        player.currentCell.j = 1;
+        setTimeout(() => {
+            player.alive = true;
+            player.element.style.transform = `translate(${player.position.x}px, ${player.position.y}px)`;
+        }, 1500)
+    },
+
+    enimyColision : function() {
+        enimies.forEach(enimy => {
+            if ((this.currentCell.i == enimy.cell.i && this.currentCell.j == enimy.cell.j)) this.death()
+        })
+    }
 }
 
 
