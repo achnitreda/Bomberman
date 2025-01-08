@@ -1,24 +1,30 @@
 import { enimies, gateCell, mapVisual } from "./map.js";
 import { player, urgentMove } from "./player.js";
 import { bomb } from "./bomb.js";
-import { enimiesNumber } from "./enimies.js";
+import { calcCellSize } from "./responsive.js";
+
+export const cellSize = calcCellSize();
 const board = document.getElementById('board')
-const grid = mapVisual(board, player);
+const grid = mapVisual(board, player, cellSize);
 const movementkeys = [];
 let placeBombe = false;
+
+console.log(cellSize);
 
 
 function gameLoop(time) {
 
-    if (movementkeys[0] != undefined) {
-        player.move(urgentMove || movementkeys[0].slice(5), grid);
+    if (movementkeys[0] != undefined && player.alive) {
+        player.move(urgentMove || movementkeys[0].slice(5), grid, cellSize);
         player.animation(time, urgentMove || movementkeys[0].slice(5));
     }
+
+    if (!player.alive) player.deathAnimation(time)
 
     if (placeBombe && (player.currentCell.i != gateCell[0] || player.currentCell.j != gateCell[1])) {
         placeBombe = false;
         bomb.exist = true;
-        bomb.create();
+        bomb.create(cellSize);
         bomb.explosion(grid);
     }
 
@@ -28,9 +34,9 @@ function gameLoop(time) {
     if (enimies.length != 0) {
         enimies.forEach(enimie => {
             //
-            
-            enimie.move(grid);
-            enimie.animate(time);
+
+            // enimie.move(grid);
+            // enimie.animate(time);
         })
     }
     requestAnimationFrame(gameLoop)

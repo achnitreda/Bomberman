@@ -1,4 +1,5 @@
 import { enimie, enimiesNumber } from "./enimies.js";
+// import { player } from "./player.js";
 
 export const mapCells = {}; // store theme whene they created and avoid quering DOM  evry time we need a cell
 export const enimieCells = [];
@@ -12,7 +13,11 @@ const soft = 1;
 const solid = 2;
 const softs = []; // store soft blocks indexes to chose on random for the gate
 export const enimies = []
-const randomNumber = () => (Math.random() < 0.6) ? empty : soft;
+
+function randomNumber() {
+    return (Math.random() < 0.6) ? empty : soft
+}
+
 function getRandomIndexes() {
     const nums = new Set();
     
@@ -28,14 +33,9 @@ function addEnimies (grid) {
         const $enimie = new enimie();
         $enimie.create(i, j);
         $enimie.updatPassability(grid);
-        // console.log($enimie.passability);
         
         enimies.push($enimie)
-        // console.log($enimie.bounds);
-    })
-
-    // enimies[0].animieCollision(enimies)  
-    
+    }) 
 }
 
 function mapGrid() {
@@ -58,26 +58,24 @@ function mapGrid() {
                 grid[i][j] = rand;
 
                 // store soft blocks indexes
-                if (rand == soft) {
-                    softs.push([i, j])
-                }
+                if (rand == soft) softs.push([i, j])
             }
         }
     }
 
     // random gate cell
     gateCell = softs[Math.floor(Math.random() * softs.length)];
-    // console.log(gateCell);
-    
-    // console.log(gateCell);
 
     return grid;
 }
 
-export function mapVisual(map, player) {
+
+export function mapVisual(map, player, cellSize) {
     const grid = mapGrid();
-    // console.log(grid)
-    // let enimieAdded = 0;
+
+    // player properties
+    player.setPlayerProperties(cellSize);
+    
     grid.forEach((row, i) => {
         row.forEach((el, j) => {
             const cell = document.createElement('div');
@@ -99,8 +97,9 @@ export function mapVisual(map, player) {
         })
     });
 
-    addEnimies(grid);
-    player.oneBoxBounds(grid);
+    // addEnimies(grid);
+    player.updateBounds(grid, cellSize);
+    
     return grid;
 }
 
