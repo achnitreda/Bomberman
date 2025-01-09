@@ -1,10 +1,11 @@
-import { mapCells, enimies } from "./map.js";
+import { mapCells } from "./map.js";
 import { bomb } from "./bomb.js";
+import { cellSize } from "./main.js";
 export const enimiesNumber = 3;
 const horz = 1, vert = -1;
 
 
-export class enimie {
+export class enemy {
     constructor() {
         this.element = null;
         this.cell = { i: 0, j: 0 };
@@ -27,7 +28,6 @@ export class enimie {
             bottom: false
         }
         this.sprite = {
-            width: 17,
             frameCount: 5,
             currentFrame: 0,
             lastUpdate: 0,
@@ -44,12 +44,12 @@ export class enimie {
 
     create(i, j) {
         const enimieCell = mapCells[`cell${i}#${j}`];
+        const pxToCenter = Math.floor((cellSize-(cellSize*0.8))/2)
         this.element = document.createElement('div');
-        this.element.classList.add('enimie');
+        this.element.classList.add('enemy');
+        this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
         this.cell.i = i;
         this.cell.j = j;
-        // this.position.x = j * 40 + 11.5;
-        // this.position.y = i * 40 + 11.5;
 
         this.axis = (Math.random() > 0.5 ? horz : vert);
 
@@ -164,23 +164,23 @@ export class enimie {
             this.sprite.currentFrame = (this.sprite.currentFrame + 1) % this.sprite.frameCount;
             this.sprite.lastUpdate = currentTime;
 
-            const x = this.sprite.currentFrame * this.sprite.width;
+            const x = this.sprite.currentFrame * (cellSize*0.8);
             this.element.style.backgroundPosition = `-${x}px 0px`;
         }
     }
 
-    collision() {
-        enimies.forEach((enimy => {
-            if (enimy != this) {
-                if (((this.position.x <= (enimy.position.x+17) || (this.position.x+17) >= enimy.position.x) && this.cell.i == enimy.cell.i)
-                || ((this.position.y <= (enimy.position.y+17) || (this.position.y+17) >= (enimy.position.y))&& this.cell.j == enimy.cell.j)) {
-            console.log("coli");
-                    return true
+    // collision() {
+    //     enimies.forEach((enimy => {
+    //         if (enimy != this) {
+    //             if (((this.position.x <= (enimy.position.x+17) || (this.position.x+17) >= enimy.position.x) && this.cell.i == enimy.cell.i)
+    //             || ((this.position.y <= (enimy.position.y+17) || (this.position.y+17) >= (enimy.position.y))&& this.cell.j == enimy.cell.j)) {
+    //         // console.log("coli");
+    //                 return true
                     
-                }
-            }
-        }))
+    //             }
+    //         }
+    //     }))
 
-        return false
-    }
+    //     return false
+    // }
 }

@@ -1,5 +1,5 @@
 import { player } from "./player.js"
-import { gateCell, enimies } from "./map.js";
+import { gateCell, enemies } from "./map.js";
 import { cellSize } from "./main.js";
 
 export const bomb = {
@@ -9,7 +9,8 @@ export const bomb = {
 
     cell: null,
 
-    neighbors: {
+    cellsAffected: {
+        center: null,
         right: null,
         left: null,
         bottom: null,
@@ -34,18 +35,19 @@ export const bomb = {
         }
     },
 
-    updateNeighbors: function () {
-        this.neighbors.right = [this.cell.i, this.cell.j + 1];
-        this.neighbors.left = [this.cell.i, this.cell.j - 1];
-        this.neighbors.bottom = [this.cell.i + 1, this.cell.j];
-        this.neighbors.top = [this.cell.i - 1, this.cell.j];
+    updateCellsAffected: function () {
+        this.cellsAffected.center = [this.cell.i, this.cell.j];
+        this.cellsAffected.right = [this.cell.i, this.cell.j + 1];
+        this.cellsAffected.left = [this.cell.i, this.cell.j - 1];
+        this.cellsAffected.bottom = [this.cell.i + 1, this.cell.j];
+        this.cellsAffected.top = [this.cell.i - 1, this.cell.j];
     },
 
     create: function (cellSize) {
-        this.sprite.frameSize = cellSize*0.8;
-        const pxToCenter = ((cellSize - this.sprite.frameSize) *0.5);
+        this.sprite.frameSize = cellSize * 0.8;
+        const pxToCenter = ((cellSize - this.sprite.frameSize) * 0.5);
         this.cell = { i: player.currentCell.i, j: player.currentCell.j };
-        this.updateNeighbors();
+        this.updateCellsAffected();
 
         const bombCell = document.getElementById(`cell${this.cell.i}#${this.cell.j}`);
         this.element = document.createElement("div");
@@ -56,38 +58,46 @@ export const bomb = {
     },
 
     explosion: function (grid) {
+        const applyExplosionEffect = (i, j) => {
+            const cell = document.getElementById(`cell${i}#${j}`);
+            const explosion = document.createElement('div');
+            explosion.classList.add('explosion-effect');
+            cell.appendChild(explosion);
+        };
+
+
         setTimeout(() => {
-            for (let neighbor in this.neighbors) {
-                const [i, j] = this.neighbors[neighbor];
-                // const emptycells = []
-                // breackable walls 
-                /*if (grid[i][j] == 0) {
-                    emptycells.push(document.getElementById(`cell${i}#${j}`))
-                }else */if (grid[i][j] == 1) {
+            for (let cell in this.cellsAffected) {
+                const [i, j] = this.cellsAffected[cell];
+
+                if (grid[i][j] == 1 || grid[i][j] === 0) {
+                    applyExplosionEffect(i, j);
                     const cell = document.getElementById(`cell${i}#${j}`);
+
+                    // gate cell
                     cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
                     grid[i][j] = 0;
                 }
 
                 //player
-                if ((player.currentCell.i == i && player.currentCell.j == j) || (player.currentCell.i == bomb.cell.i && player.currentCell.j == bomb.cell.j)) {
+                if ((player.currentCell.i == i && player.currentCell.j == j)) {
                     player.death(cellSize);
                 }
 
                 // enimies 
-                // enimies.forEach((enimy, index) => {
-                //     if (enimy.cell.i == i && enimy.cell.j == j) {
-                //         enimies.splice(index, 1);
-                //         enimy.element.remove();
-                //     }
-                // })
+                enemies.forEach((enemy, index) => {
+                    if (enemy.cell.i == i && enemy.cell.j == j) {
+                        enemies.splice(index, 1);
+                        enemy.element.remove();
+                    }
+                })
+
             }
 
 
             bomb.cell = null;
-            this.element.remove();
+            this.element.style.opacity = '0';
             this.exist = false;
         }, 1500)
     },
 }
-

@@ -1,15 +1,15 @@
 
-const gameElements = {
-    cellSize: 0,
-    playerSize: 0,
-    enimieSize: 0,
-    bombeSize: 0,
-    playerX: 0,
-    playerY: 0,
-    bombX: 0,
-    bombY: 0,
-    playerX: 0,
-}
+// const gameElements = {
+//     cellSize: 0,
+//     playerSize: 0,
+//     enimieSize: 0,
+//     bombeSize: 0,
+//     playerX: 0,
+//     playerY: 0,
+//     bombX: 0,
+//     bombY: 0,
+//     playerX: 0,
+// }
 
 export function calcCellSize() {
     const windowWidth = window.innerWidth;
@@ -25,9 +25,4 @@ export function calcCellSize() {
     document.documentElement.style.setProperty('--cellSize', `${cellSize}px`);
 
     return cellSize
-}
-
-function calcElementsSizes() {
-
-    // gameElements.playerSize = 
 }

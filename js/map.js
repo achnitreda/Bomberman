@@ -1,8 +1,8 @@
-import { enimie, enimiesNumber } from "./enimies.js";
+import { enemy, enimiesNumber } from "./enemies.js";
 // import { player } from "./player.js";
 
 export const mapCells = {}; // store theme whene they created and avoid quering DOM  evry time we need a cell
-export const enimieCells = [];
+export const enemiesCells = [];
 export let gateCell = null;
 export const cellWidth = 40;
 export const cellHeight = 40;
@@ -12,7 +12,7 @@ const empty = 0;
 const soft = 1;
 const solid = 2;
 const softs = []; // store soft blocks indexes to chose on random for the gate
-export const enimies = []
+export const enemies = []
 
 function randomNumber() {
     return (Math.random() < 0.6) ? empty : soft
@@ -22,19 +22,18 @@ function getRandomIndexes() {
     const nums = new Set();
     
     while(nums.size < enimiesNumber) {
-        nums.add(Math.floor(Math.random() * enimieCells.length));
+        nums.add(Math.floor(Math.random() * enemiesCells.length));
     }
     return Array.from(nums);
 }
 
 function addEnimies (grid) {
     getRandomIndexes().forEach((el) => {
-        const [i, j] = enimieCells[el];
-        const $enimie = new enimie();
-        $enimie.create(i, j);
-        $enimie.updatPassability(grid);
-        
-        enimies.push($enimie)
+        const [i, j] = enemiesCells[el];
+        const $enemy = new enemy();
+        $enemy.create(i, j);
+        $enemy.updatPassability(grid);
+        enemies.push($enemy)
     }) 
 }
 
@@ -87,7 +86,7 @@ export function mapVisual(map, player, cellSize) {
             } else {
                 cell.classList.add('empty')
                 if (i >= 2 && j>1 && (i+1)%2 == 0 && (j+1)%2== 0) {
-                    enimieCells.push([i, j])
+                    enemiesCells.push([i, j])
                 }
             }
 
@@ -97,7 +96,7 @@ export function mapVisual(map, player, cellSize) {
         })
     });
 
-    // addEnimies(grid);
+    addEnimies(grid);
     player.updateBounds(grid, cellSize);
     
     return grid;

@@ -20,6 +20,7 @@ body {
 }
 
 .cell {
+    position: relative;
     width: var(--cellSize);
     height: var(--cellSize);
     border: solid 1px gray;
@@ -44,17 +45,16 @@ body {
     height: calc(var(--cellSize)*0.8);
     background-image: url('./bomb.png');
     background-size: calc(var(--cellSize)*0.8*5) calc(var(--cellSize)*0.8);
-    /* transform: translate(6px, 6px); */
 }
 
-.enimie {
+.enemy {
     position: absolute;
     width: calc(var(--cellSize)*0.8);
     height: calc(var(--cellSize)*0.8);
-    /* background-color: blue; */
     background-image: url('./enimy.png');
+    background-color: aqua;
     background-size: calc(var(--cellSize)*0.8*5) calc(var(--cellSize)*0.8);
-    /* transform: translate(11.5px, 11.5px); */
+    z-index: 1;
 }
 
 #player {
@@ -71,4 +71,31 @@ body {
 
 .gate {
     background-color: blueviolet;
+}
+
+.opacity0 {
+    opacity: 0.1;
+}
+
+.opacity1 {
+    opacity: 1;
+}
+
+.explosion-effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle,yellow 20%,orange 60%, red 100%);
+    animation: explosion 0.5s forwards;
+}
+
+@keyframes explosion {
+    from {
+        transform: scale(0.9);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1.2);
+        opacity: 0;
+    }
 }

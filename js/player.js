@@ -1,4 +1,4 @@
-import { enimies } from "./map.js";
+import { enemies } from "./map.js";
 
 // let this.speed = 0;
 let urgentMove = "";
@@ -8,6 +8,7 @@ const player = {
     alive: true,
     size: 0,
     speed: 0,
+    revive: false,
 
     currentCell: {
         i: 1,
@@ -43,11 +44,8 @@ const player = {
     },
 
     deathSprite: {
-        framesize: 0,
-        currentFrame: 0,
-        frameCount: 7,
         lastUpdate: 0,
-        animationSpeed: 1500 / 7,
+        animationSpeed: 80,
     },
 
     animation: function (currentTime, dir) {
@@ -64,11 +62,8 @@ const player = {
 
     deathAnimation: function (currentTime) {
         if (currentTime - this.deathSprite.lastUpdate > this.deathSprite.animationSpeed) {
-            this.deathSprite.currentFrame = (this.deathSprite.currentFrame + 1) % this.deathSprite.frameCount;
             this.deathSprite.lastUpdate = currentTime;
-
-            const x = this.deathSprite.currentFrame * this.deathSprite.framesize;
-            this.element.style.backgroundPosition = `-${x}px 0px`;
+            this.element.classList.toggle('opacity0');
         }
     },
 
@@ -106,7 +101,7 @@ const player = {
             right: this.size * 3
         }
 
-        this.element.style.backgroundSize = `${cellsize*0.8*4}px ${cellsize*0.8*4}px`
+        this.element.style.backgroundSize = `${cellsize * 0.8 * 4}px ${cellsize * 0.8 * 4}px`
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     },
 
@@ -211,8 +206,7 @@ const player = {
 
     death: function (cellSize) {
         this.alive = false;
-        this.element.style.backgroundImage = `url(./bombermandeath.png)`;
-        this.element.style.backgroundSize = `${cellSize*0.8*7}px ${cellSize*0.8}px`;
+        this.element.classList.remove('opacity1')
         this.element.style.backgroundPosition = `0px 0px`;
         this.position.x = cellSize + Math.floor((cellSize - this.size) * 0.5);
         this.position.y = cellSize + Math.floor((cellSize - this.size) * 0.5);
@@ -220,16 +214,19 @@ const player = {
         this.currentCell.j = 1;
 
         setTimeout(() => {
+            this.revive = true;
             this.alive = true;
-            this.element.style.backgroundImage = `url(./bomberman.png)`;
-            this.element.style.backgroundPosition = `0px 0px`;
-            this.element.style.backgroundSize = `${cellSize*0.8*4}px ${cellSize*0.8*4}px`;
+            
             this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
-        }, 1500)
+            setTimeout(() => {
+                this.element.classList.add('opacity1')
+                this.revive = false;
+            }, 2000)
+        }, 2000)
     },
 
     enimyColision: function () {
-        enimies.forEach(enimy => {
+        enemies.forEach(enimy => {
             if ((this.currentCell.i == enimy.cell.i && this.currentCell.j == enimy.cell.j)) this.death()
         })
     }
