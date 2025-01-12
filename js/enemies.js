@@ -1,25 +1,30 @@
-import { mapCells } from "./map.js";
+import { enemies, mapCells } from "./map.js";
 import { bomb } from "./bomb.js";
 import { cellSize } from "./main.js";
+import { player } from "./player.js";
 export const enimiesNumber = 3;
-const horz = 1, vert = -1;
+const speed = 1;
+// const horz = 1, vert = -1;
 
 
 export class enemy {
     constructor() {
         this.element = null;
         this.cell = { i: 0, j: 0 };
-        // this.width = 17;
-        // this.hight = 17;
-        // this.position = { x: 0, y: 0 };
-        this.positionInCell = { x: 11.5, y: 11.5 };
+        this.size = 0;
+        this.position = {x: 0, y: 0};
+        this.positionInCell = {x: 0, y: 0};
         this.axis = null;
-        this.direction = 1;
+        this.moveEntries = {
+            hor: ['x', 'left', 'right'],
+            ver: ['y', 'top', 'bottom'],
+            direction: 1
+        };
         this.bounds = {
-            right: 40,
+            right: 0,
             left: 0,
             top: 0,
-            bottom: 40
+            bottom: 0
         }
         this.passability = {
             right: false,
@@ -35,152 +40,141 @@ export class enemy {
         }
     }
 
-    updatPassability(grid) {
-        this.passability.right = grid[this.cell.i][this.cell.j + 1] == 0;
-        this.passability.left = grid[this.cell.i][this.cell.j - 1] == 0;
-        this.passability.bottom = grid[this.cell.i + 1][this.cell.j] == 0;
-        this.passability.top = grid[this.cell.i - 1][this.cell.j] == 0;
+    updateBounds(grid) {
+        const posX = ((this.position.x + (this.size*0.55)) / cellSize);
+        const posY = ((this.position.y + (this.size*0.55)) / cellSize);
+
+
+        this.bounds.left = Math.floor(posX) * cellSize;
+        this.bounds.top = Math.floor(posY) * cellSize;
+        this.bounds.right = Math.ceil(posX) * cellSize;
+        this.bounds.bottom = Math.ceil(posY) * cellSize;
+
+        this.updatPassability(grid)
     }
 
-    create(i, j) {
-        const enimieCell = mapCells[`cell${i}#${j}`];
-        const pxToCenter = Math.floor((cellSize-(cellSize*0.8))/2)
+    updatPassability(grid) {
+        const i = Math.floor((this.position.y + (this.size * 0.55))/cellSize);
+        const j = Math.floor((this.position.x + (this.size * 0.55))/cellSize);
+
+        this.passability.right = grid[i][j + 1] == 0;
+        this.passability.left = grid[i][j - 1] == 0;
+        this.passability.bottom = grid[i + 1][j] == 0;
+        this.passability.top = grid[i - 1][j] == 0;   
+
+        this.cell.i = i;
+        this.cell.j = j;
+    }
+
+    create(i, j, grid) {
+        const enimieCell = document.getElementById(`cell${i}#${j}`);
+        const pxToCenter = Math.floor((cellSize - (cellSize * 0.8)) / 2);
         this.element = document.createElement('div');
         this.element.classList.add('enemy');
         this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
         this.cell.i = i;
         this.cell.j = j;
+        this.position.x = cellSize * j + pxToCenter;
+        this.position.y = cellSize * i + pxToCenter;
+        this.positionInCell.x = pxToCenter;
+        this.positionInCell.y = pxToCenter;
+        this.size = cellSize * 0.8;
 
-        this.axis = (Math.random() > 0.5 ? horz : vert);
-
+        
+        
+        this.axis = (Math.random() > 0.5 ? 'hor' : 'ver');
+        this.updateBounds(grid);
         enimieCell.appendChild(this.element);
     }
 
     move(grid) {
-        if (this.axis == horz) {
+        // console.log(this.position[this.moveEntries[this.axis][0]]);
+        
+        if (this.moveEntries.direction == 1) {
+            if (this.position[this.moveEntries[this.axis][0]] + this.size + speed <= this.bounds[this.moveEntries[this.axis][2]]) {
+                this.position[this.moveEntries[this.axis][0]] += speed;
+                this.positionInCell[this.moveEntries[this.axis][0]] += speed;
 
-            const steps = 1 * this.direction;
-            this.positionInCell.x += steps;
 
-            if (this.direction == 1) {
-                if ((this.positionInCell.x + 17) <= this.bounds.right) {
-                    this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
-                    // if (this.collision()) {
-                    //     this.direction = -1;
-                    // }
-                } else {
-                    this.passability.right = grid[this.cell.i][this.cell.j + 1] == 0;
-                    this.passability.left = grid[this.cell.i][this.cell.j - 1] == 0;
-                    if (this.passability.right) {
-                        if (bomb.cell && (this.cell.j + 1 == bomb.cell.j && this.cell.i == bomb.cell.i)
-                           ) {
-                            this.direction = -1;
-                        } else {
-                            this.bounds.right += 40;
-                            this.bounds.left += 40;
-                            this.cell.j++;
-                            this.passability.right = grid[this.cell.i][this.cell.j + 1] == 0;
-                            this.passability.left = grid[this.cell.i][this.cell.j - 1] == 0;
-                        }
 
-                    } else {
-                        this.direction = -1
-                    }
-                }
             } else {
-                if ((this.positionInCell.x) >= this.bounds.left) {
-                    this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
-                } else {
-                    
-                    if (this.passability.left) {
-                        if (bomb.cell && (this.cell.j - 1 == bomb.cell.j && this.cell.i == bomb.cell.i)) {
-                            this.direction = 1
-                        } else {
-                            this.bounds.left -= 40;
-                            this.bounds.right -= 40;
-                            this.cell.j--;
-                            this.passability.left = grid[this.cell.i][this.cell.j - 1] == 0;
-                            this.passability.right = grid[this.cell.i][this.cell.j + 1] == 0;
+                if (this.passability[this.moveEntries[this.axis][2]]) {
+                    this.position[this.moveEntries[this.axis][0]] += speed;
+                    this.positionInCell[this.moveEntries[this.axis][0]] += speed;
+                    if (this.axis == 'hor') {
+                        if (bomb.cell && (this.cell.j + 1 == bomb.cell.j && this.cell.i == bomb.cell.i)) {
+                            this.moveEntries.direction = -1
                         }
-
                     } else {
-                        this.direction = 1
+                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i+1 == bomb.cell.i)) {
+                            this.moveEntries.direction = -1
+                        }
                     }
+                } else {
+                    this.moveEntries.direction = -1;
                 }
             }
 
+            if (this.position[this.moveEntries[this.axis][0]] + (this.size * 0.55) > this.bounds[this.moveEntries[this.axis][2]]) {
+                this.updateBounds(grid);
+            }
         } else {
+            if (this.position[this.moveEntries[this.axis][0]] - speed >= this.bounds[this.moveEntries[this.axis][1]]) {
+                this.position[this.moveEntries[this.axis][0]] -= speed;
+                this.positionInCell[this.moveEntries[this.axis][0]] -= speed;
 
-            const steps = 1 * this.direction;
-            this.positionInCell.y += steps;
 
-            if (this.direction == 1) {
-                if ((this.positionInCell.y + 17) <= this.bounds.bottom) {
-                    this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
-                } else {
-                    this.passability.bottom = grid[this.cell.i + 1][this.cell.j] == 0;
-                    this.passability.top = grid[this.cell.i - 1][this.cell.j] == 0;
-                    if (this.passability.bottom) {
-                        if (bomb.cell && (this.cell.j  == bomb.cell.j && this.cell.i+1 == bomb.cell.i)) {
-                            this.direction = -1
-                        } else {
-                            this.bounds.bottom += 40;
-                            this.bounds.top += 40;
-                            this.cell.i++;
-                            this.passability.bottom = grid[this.cell.i + 1][this.cell.j] == 0;
-                            this.passability.top = grid[this.cell.i - 1][this.cell.j] == 0;
-                        }
 
-                    } else {
-                        this.direction = -1
-                    }
-                }
             } else {
-                if ((this.positionInCell.y) >= this.bounds.top) {
-                    this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
-                } else {
-                    if (this.passability.top) {
-                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i-1 == bomb.cell.i)) {
-                            this.direction = 1
-                        } else {
-                            this.bounds.top -= 40;
-                            this.bounds.bottom -= 40;
-                            this.cell.i--;
-                            this.passability.top = grid[this.cell.i - 1][this.cell.j] == 0;
-                            this.passability.bottom = grid[this.cell.i + 1][this.cell.j] == 0;
+                if (this.passability[this.moveEntries[this.axis][1]]) {
+                    this.position[this.moveEntries[this.axis][0]] -= speed;
+                    this.positionInCell[this.moveEntries[this.axis][0]] -= speed;
+                    if (this.axis == 'hor') {
+                        if (bomb.cell && (this.cell.j - 1 == bomb.cell.j && this.cell.i == bomb.cell.i)) {
+                            this.moveEntries.direction = 1
                         }
-
                     } else {
-                        this.direction = 1
+                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i-1 == bomb.cell.i)) {
+                            this.moveEntries.direction = 1
+                        }
                     }
+                } else {
+                    this.moveEntries.direction = 1;
                 }
             }
 
+            if (this.position[this.moveEntries[this.axis][0]] + (this.size * 0.55) < this.bounds[this.moveEntries[this.axis][1]]) {
+                this.updateBounds(grid);
+
+            }
         }
+
+        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`
+        if (this.collisionWithplayer()) {
+            player.death(cellSize);
+        }
+
     }
+
 
     animate(currentTime) {
         if (currentTime - this.sprite.lastUpdate > this.sprite.animationSpeed) {
             this.sprite.currentFrame = (this.sprite.currentFrame + 1) % this.sprite.frameCount;
             this.sprite.lastUpdate = currentTime;
 
-            const x = this.sprite.currentFrame * (cellSize*0.8);
+            const x = this.sprite.currentFrame * (cellSize * 0.8);
             this.element.style.backgroundPosition = `-${x}px 0px`;
         }
     }
 
-    // collision() {
-    //     enimies.forEach((enimy => {
-    //         if (enimy != this) {
-    //             if (((this.position.x <= (enimy.position.x+17) || (this.position.x+17) >= enimy.position.x) && this.cell.i == enimy.cell.i)
-    //             || ((this.position.y <= (enimy.position.y+17) || (this.position.y+17) >= (enimy.position.y))&& this.cell.j == enimy.cell.j)) {
-    //         // console.log("coli");
-    //                 return true
-                    
-    //             }
-    //         }
-    //     }))
+    collisionWithplayer() {
+        const enemyRect = this.element.getBoundingClientRect();
+        const playerRect = player.element.getBoundingClientRect();
 
-    //     return false
-    // }
+        return !(enemyRect.right < playerRect.left || 
+                enemyRect.left > playerRect.right || 
+                enemyRect.bottom < playerRect.top || 
+                enemyRect.top > playerRect.bottom);
+    }
+
 }

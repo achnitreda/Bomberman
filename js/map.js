@@ -12,7 +12,8 @@ const empty = 0;
 const soft = 1;
 const solid = 2;
 const softs = []; // store soft blocks indexes to chose on random for the gate
-export const enemies = []
+export const enemies = [];
+export const stuckEnemies = [];
 
 function randomNumber() {
     return (Math.random() < 0.6) ? empty : soft
@@ -27,12 +28,17 @@ function getRandomIndexes() {
     return Array.from(nums);
 }
 
+function stuck(enemy) {
+    return (enemy.axis == 'hor') ? enemy.passability.right || enemy.passability.left :
+                                   enemy.passability.top || enemy.passability.bottom
+}
+
 function addEnimies (grid) {
     getRandomIndexes().forEach((el) => {
         const [i, j] = enemiesCells[el];
         const $enemy = new enemy();
-        $enemy.create(i, j);
-        $enemy.updatPassability(grid);
+        $enemy.create(i, j, grid);
+        if (!stuck($enemy)) stuckEnemies.push($enemy);
         enemies.push($enemy)
     }) 
 }

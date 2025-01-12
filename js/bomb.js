@@ -1,5 +1,5 @@
 import { player } from "./player.js"
-import { gateCell, enemies } from "./map.js";
+import { gateCell, enemies, stuckEnemies } from "./map.js";
 import { cellSize } from "./main.js";
 
 export const bomb = {
@@ -85,11 +85,16 @@ export const bomb = {
                 }
 
                 // enimies 
-                enemies.forEach((enemy, index) => {
+                enemies.forEach((enemy, index) => { 
                     if (enemy.cell.i == i && enemy.cell.j == j) {
                         enemies.splice(index, 1);
                         enemy.element.remove();
                     }
+                })
+
+                // stuck enemies 
+                stuckEnemies.forEach(enemy => {
+                    enemy.updateBounds(grid)
                 })
 
             }

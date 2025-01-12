@@ -205,6 +205,7 @@ const player = {
     },
 
     death: function (cellSize) {
+        if (!this.alive) return;
         this.alive = false;
         this.element.classList.remove('opacity1')
         this.element.style.backgroundPosition = `0px 0px`;
@@ -223,12 +224,6 @@ const player = {
                 this.revive = false;
             }, 2000)
         }, 2000)
-    },
-
-    enimyColision: function () {
-        enemies.forEach(enimy => {
-            if ((this.currentCell.i == enimy.cell.i && this.currentCell.j == enimy.cell.j)) this.death()
-        })
     }
 }
 
