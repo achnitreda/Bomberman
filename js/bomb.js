@@ -45,7 +45,7 @@ export const bomb = {
 
     create: function (cellSize) {
         this.sprite.frameSize = cellSize * 0.8;
-        const pxToCenter = ((cellSize - this.sprite.frameSize) * 0.5);
+        const pxToCenter = (cellSize - this.sprite.frameSize) * 0.5;
         this.cell = { i: player.currentCell.i, j: player.currentCell.j };
         this.updateCellsAffected();
 
@@ -85,7 +85,7 @@ export const bomb = {
                 }
 
                 // enimies 
-                enemies.forEach((enemy, index) => { 
+                enemies.forEach((enemy, index) => {
                     if (enemy.cell.i == i && enemy.cell.j == j) {
                         enemies.splice(index, 1);
                         enemy.element.remove();
@@ -99,8 +99,12 @@ export const bomb = {
 
             }
 
-
-            bomb.cell = null;
+            this.cell = null;
+            /**
+             * TODO:
+             * element should be removed
+             * for performance reasons
+             */
             this.element.style.opacity = '0';
             this.exist = false;
         }, 1500)

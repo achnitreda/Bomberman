@@ -1,5 +1,5 @@
 import { enemies, gateCell, mapVisual } from "./map.js";
-import { player, urgentMove } from "./player.js";
+import { player } from "./player.js";
 import { bomb } from "./bomb.js";
 import { calcCellSize } from "./responsive.js";
 
@@ -7,16 +7,15 @@ export const cellSize = calcCellSize();
 const board = document.getElementById('board')
 const grid = mapVisual(board, player, cellSize);
 const movementkeys = [];
-let placeBombe = false;
 
-// console.log(cellSize);
+let placeBombe = false;
 
 
 function gameLoop(time) {
-
     if (movementkeys[0] != undefined && player.alive) {
-        player.move(urgentMove || movementkeys[0].slice(5), grid, cellSize);
-        player.animation(time, urgentMove || movementkeys[0].slice(5));
+        const direction = movementkeys[0].slice(5);
+        player.move(direction, grid, cellSize);
+        player.animation(time, direction);
     }
 
     if (!player.alive || player.revive) player.deathAnimation(time)
@@ -26,11 +25,14 @@ function gameLoop(time) {
         bomb.exist = true;
         bomb.create(cellSize);
         bomb.explosion(grid);
+    } else {
+        placeBombe = false;
     }
 
     if (bomb.exist) {
         bomb.animate(time)
     }
+
     if (enemies.length != 0) {
         enemies.forEach(enemy => {
             enemy.move(grid);
@@ -40,26 +42,17 @@ function gameLoop(time) {
     requestAnimationFrame(gameLoop)
 }
 
-
-
 document.addEventListener("keydown", (e) => {
-    if (e.key == "ArrowUp" || e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "ArrowDown") {
+    if (e.key.startsWith('Arrow')) {
         if (!movementkeys.includes(e.key)) {
             movementkeys.unshift(e.key);
-        }
-        if (movementkeys.length != 0) {
-            player.sprite.animate = true;
         }
     }
 })
 
 document.addEventListener("keyup", (e) => {
-    if (e.key == "ArrowUp" || e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "ArrowDown") {
+    if (e.key.startsWith('Arrow')) {
         movementkeys.splice(movementkeys.indexOf(e.key), 1)
-    }
-
-    if (movementkeys.length == 0) {
-        player.sprite.animate = false;
     }
 })
 

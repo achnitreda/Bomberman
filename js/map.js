@@ -1,7 +1,5 @@
 import { enemy, enimiesNumber } from "./enemies.js";
-// import { player } from "./player.js";
 
-export const mapCells = {}; // store theme whene they created and avoid quering DOM  evry time we need a cell
 export const enemiesCells = [];
 export let gateCell = null;
 export const cellWidth = 40;
@@ -11,7 +9,7 @@ const mapHeight = 13;
 const empty = 0;
 const soft = 1;
 const solid = 2;
-const softs = []; // store soft blocks indexes to chose on random for the gate
+const softs = [];
 export const enemies = [];
 export const stuckEnemies = [];
 
@@ -21,26 +19,25 @@ function randomNumber() {
 
 function getRandomIndexes() {
     const nums = new Set();
-    
-    while(nums.size < enimiesNumber) {
+    while (nums.size < enimiesNumber) {
         nums.add(Math.floor(Math.random() * enemiesCells.length));
     }
     return Array.from(nums);
 }
 
 function stuck(enemy) {
-    return (enemy.axis == 'hor') ? enemy.passability.right || enemy.passability.left :
-                                   enemy.passability.top || enemy.passability.bottom
+    return (enemy.axis == 'hor') ? (enemy.passability.right || enemy.passability.left) :
+        (enemy.passability.top || enemy.passability.bottom)
 }
 
-function addEnimies (grid) {
+function addEnimies(grid) {
     getRandomIndexes().forEach((el) => {
         const [i, j] = enemiesCells[el];
         const $enemy = new enemy();
         $enemy.create(i, j, grid);
         if (!stuck($enemy)) stuckEnemies.push($enemy);
         enemies.push($enemy)
-    }) 
+    })
 }
 
 function mapGrid() {
@@ -80,7 +77,7 @@ export function mapVisual(map, player, cellSize) {
 
     // player properties
     player.setPlayerProperties(cellSize);
-    
+
     grid.forEach((row, i) => {
         row.forEach((el, j) => {
             const cell = document.createElement('div');
@@ -91,20 +88,20 @@ export function mapVisual(map, player, cellSize) {
                 cell.classList.add('softWall')
             } else {
                 cell.classList.add('empty')
-                if (i >= 2 && j>1 && (i+1)%2 == 0 && (j+1)%2== 0) {
+                if (i >= 2 && j > 1 && (i + 1) % 2 == 0 && (j + 1) % 2 == 0) {
                     enemiesCells.push([i, j])
                 }
             }
 
             cell.id = `cell${i}#${j}`
-            mapCells[`cell${i}#${j}`] = cell;
             map.appendChild(cell)
         })
     });
 
     addEnimies(grid);
+    console.log("enemies", enemies)
     player.updateBounds(grid, cellSize);
-    
+
     return grid;
 }
 

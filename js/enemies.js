@@ -1,4 +1,3 @@
-import { enemies, mapCells } from "./map.js";
 import { bomb } from "./bomb.js";
 import { cellSize } from "./main.js";
 import { player } from "./player.js";
@@ -6,14 +5,13 @@ export const enimiesNumber = 3;
 const speed = 1;
 // const horz = 1, vert = -1;
 
-
 export class enemy {
     constructor() {
         this.element = null;
         this.cell = { i: 0, j: 0 };
         this.size = 0;
-        this.position = {x: 0, y: 0};
-        this.positionInCell = {x: 0, y: 0};
+        this.position = { x: 0, y: 0 };
+        this.positionInCell = { x: 0, y: 0 };
         this.axis = null;
         this.moveEntries = {
             hor: ['x', 'left', 'right'],
@@ -41,8 +39,8 @@ export class enemy {
     }
 
     updateBounds(grid) {
-        const posX = ((this.position.x + (this.size*0.55)) / cellSize);
-        const posY = ((this.position.y + (this.size*0.55)) / cellSize);
+        const posX = ((this.position.x + (this.size * 0.55)) / cellSize);
+        const posY = ((this.position.y + (this.size * 0.55)) / cellSize);
 
 
         this.bounds.left = Math.floor(posX) * cellSize;
@@ -54,13 +52,13 @@ export class enemy {
     }
 
     updatPassability(grid) {
-        const i = Math.floor((this.position.y + (this.size * 0.55))/cellSize);
-        const j = Math.floor((this.position.x + (this.size * 0.55))/cellSize);
+        const i = Math.floor((this.position.y + (this.size * 0.55)) / cellSize);
+        const j = Math.floor((this.position.x + (this.size * 0.55)) / cellSize);
 
         this.passability.right = grid[i][j + 1] == 0;
         this.passability.left = grid[i][j - 1] == 0;
         this.passability.bottom = grid[i + 1][j] == 0;
-        this.passability.top = grid[i - 1][j] == 0;   
+        this.passability.top = grid[i - 1][j] == 0;
 
         this.cell.i = i;
         this.cell.j = j;
@@ -80,8 +78,8 @@ export class enemy {
         this.positionInCell.y = pxToCenter;
         this.size = cellSize * 0.8;
 
-        
-        
+
+
         this.axis = (Math.random() > 0.5 ? 'hor' : 'ver');
         this.updateBounds(grid);
         enimieCell.appendChild(this.element);
@@ -89,7 +87,7 @@ export class enemy {
 
     move(grid) {
         // console.log(this.position[this.moveEntries[this.axis][0]]);
-        
+
         if (this.moveEntries.direction == 1) {
             if (this.position[this.moveEntries[this.axis][0]] + this.size + speed <= this.bounds[this.moveEntries[this.axis][2]]) {
                 this.position[this.moveEntries[this.axis][0]] += speed;
@@ -106,7 +104,7 @@ export class enemy {
                             this.moveEntries.direction = -1
                         }
                     } else {
-                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i+1 == bomb.cell.i)) {
+                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i + 1 == bomb.cell.i)) {
                             this.moveEntries.direction = -1
                         }
                     }
@@ -134,7 +132,7 @@ export class enemy {
                             this.moveEntries.direction = 1
                         }
                     } else {
-                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i-1 == bomb.cell.i)) {
+                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i - 1 == bomb.cell.i)) {
                             this.moveEntries.direction = 1
                         }
                     }
@@ -171,10 +169,10 @@ export class enemy {
         const enemyRect = this.element.getBoundingClientRect();
         const playerRect = player.element.getBoundingClientRect();
 
-        return !(enemyRect.right < playerRect.left || 
-                enemyRect.left > playerRect.right || 
-                enemyRect.bottom < playerRect.top || 
-                enemyRect.top > playerRect.bottom);
+        return !(enemyRect.right < playerRect.left ||
+            enemyRect.left > playerRect.right ||
+            enemyRect.bottom < playerRect.top ||
+            enemyRect.top > playerRect.bottom);
     }
 
 }
