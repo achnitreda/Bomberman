@@ -86,7 +86,6 @@ const player = {
     },
 
     move: function (direction, grid, cellSize) {
-        console.log("move cellSize ->", cellSize)
         const pxToCenter = Math.floor((cellSize - this.size) * 0.5);
         const centerY = (Math.floor((this.position.y + (this.size * 0.5)) / cellSize) * cellSize) + pxToCenter;
         const centerX = (Math.floor((this.position.x + (this.size * 0.5)) / cellSize) * cellSize) + pxToCenter;

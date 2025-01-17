@@ -1,5 +1,6 @@
 import { bomb } from "./bomb.js";
-import { enemies } from "./map.js";
+import { Enemy, enimiesNumber } from "./enemies.js";
+import { enemies, enemiesCells } from "./map.js";
 
 export function calcCellSize() {
     const windowWidth = window.innerWidth;
@@ -31,20 +32,28 @@ const debounce = (func, wait = 0) => {
 }
 
 export const handleResize = debounce((gameState) => {
-    gameState.cellSize = calcCellSize()
-    gameState.player.setPlayerProperties(gameState.cellSize);
-    gameState.player.updateBounds(gameState.grid, gameState.cellSize)
-    console.log("cellSize ->", gameState.cellSize)
+    enemies.forEach(enemy => {
+        if (enemy.element && enemy.element.parentNode) {
+            enemy.element.parentNode.removeChild(enemy.element);
+        }
+    });
 
-    if (enemies.length > 0) {
-        enemies.forEach(enemy => {
-            enemy.updateSize(gameState.cellSize)
-            // enemy.updateBounds(gameState.grid)
-        })
-    }
+    enemies.length = 0;
+
+    gameState.cellSize = calcCellSize();
+
+    const selectedCells = enemiesCells.slice(0, enimiesNumber);
+
+    selectedCells.forEach(([i, j]) => {
+        const enemy = new Enemy();
+        enemy.create(i, j, gameState.grid);
+        enemies.push(enemy);
+    });
+
+    gameState.player.setPlayerProperties(gameState.cellSize);
+    gameState.player.updateBounds(gameState.grid, gameState.cellSize);
 
     if (bomb.exist) {
         bomb.updateSize(gameState.cellSize);
     }
-
-}, 250)
+}, 250);

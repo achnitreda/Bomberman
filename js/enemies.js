@@ -1,10 +1,8 @@
 import { bomb } from "./bomb.js";
 import { gameState } from "./main.js";
 import { player } from "./player.js";
-export const enimiesNumber = 1;
+export const enimiesNumber = 3;
 const speed = 1;
-// const horz = 1, vert = -1;
-
 export class Enemy {
     constructor() {
         this.element = null;
@@ -39,32 +37,32 @@ export class Enemy {
         }
     }
 
-    updateSize(cellSize) {
-        this.size = cellSize * 0.8
+    setEnemyProperties(cellSize) {
+        this.size = cellSize * 0.8;
         const pxToCenter = Math.floor((cellSize - this.size) / 2);
 
-        this.positionInCell.x = pxToCenter
-        this.positionInCell.y = pxToCenter
+        this.position.x = cellSize * this.cell.j + pxToCenter;
+        this.position.y = cellSize * this.cell.i + pxToCenter;
 
-        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
+        this.positionInCell.x = pxToCenter;
+        this.positionInCell.y = pxToCenter;
+
+        if (this.element) {
+            this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
+        }
     }
+
 
     updateBounds(grid) {
         const cellSize = gameState.cellSize
+
         const posX = ((this.position.x + (this.size * 0.55)) / cellSize);
         const posY = ((this.position.y + (this.size * 0.55)) / cellSize);
-
 
         this.bounds.left = Math.floor(posX) * cellSize;
         this.bounds.top = Math.floor(posY) * cellSize;
         this.bounds.right = Math.ceil(posX) * cellSize;
         this.bounds.bottom = Math.ceil(posY) * cellSize;
-
-        console.log("----updateBounds-----")
-        console.log(cellSize)
-        console.log(this.position.x)
-        console.log(this.position.y)
-        console.log(this.bounds)
 
         this.updatPassability(grid)
     }
@@ -86,40 +84,23 @@ export class Enemy {
     create(i, j, grid) {
         const cellSize = gameState.cellSize
         const enimieCell = document.getElementById(`cell${i}#${j}`);
-        this.size = cellSize * 0.8;
-        const pxToCenter = Math.floor((cellSize - this.size) / 2);
+
         this.element = document.createElement('div');
         this.element.classList.add('enemy');
-        this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
+
         this.cell.i = i;
         this.cell.j = j;
-        this.position.x = cellSize * j + pxToCenter;
-        this.position.y = cellSize * i + pxToCenter;
-        this.positionInCell.x = pxToCenter;
-        this.positionInCell.y = pxToCenter;
 
-
+        this.setEnemyProperties(cellSize);
 
         this.axis = (Math.random() > 0.5 ? 'hor' : 'ver');
         this.updateBounds(grid);
         enimieCell.appendChild(this.element);
-
-        console.log("-------Debug-----")
-        console.log("cellSize =>", cellSize)
-        console.log("this.size =>", this.size)
-        console.log("pxToCenter =>", pxToCenter)
-        console.log("this.cell.i =>", this.cell.i)
-        console.log("this.cell.j =>", this.cell.j)
-        console.log("this.position.x =>", this.position.x)
-        console.log("this.position.y =>", this.position.y)
-        console.log("this.positionInCell.x =>", this.positionInCell.x)
-        console.log("this.positionInCell.y =>", this.positionInCell.y)
-
     }
 
     move(grid) {
-        // console.log(this.position[this.moveEntries[this.axis][0]]);
         const cellSize = gameState.cellSize
+
         if (this.moveEntries.direction == 1) {
             if (this.position[this.moveEntries[this.axis][0]] + this.size + speed <= this.bounds[this.moveEntries[this.axis][2]]) {
                 this.position[this.moveEntries[this.axis][0]] += speed;
@@ -150,8 +131,6 @@ export class Enemy {
                 this.position[this.moveEntries[this.axis][0]] -= speed;
                 this.positionInCell[this.moveEntries[this.axis][0]] -= speed;
 
-
-
             } else {
                 if (this.passability[this.moveEntries[this.axis][1]]) {
                     this.position[this.moveEntries[this.axis][0]] -= speed;
@@ -180,7 +159,6 @@ export class Enemy {
         if (this.collisionWithplayer()) {
             player.death(cellSize);
         }
-
     }
 
     animate(currentTime) {
