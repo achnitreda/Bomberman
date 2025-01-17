@@ -1,4 +1,5 @@
 import { bomb } from "./bomb.js";
+import { enemies } from "./map.js";
 
 export function calcCellSize() {
     const windowWidth = window.innerWidth;
@@ -34,6 +35,13 @@ export const handleResize = debounce((gameState) => {
     gameState.player.setPlayerProperties(gameState.cellSize);
     gameState.player.updateBounds(gameState.grid, gameState.cellSize)
     console.log("cellSize ->", gameState.cellSize)
+
+    if (enemies.length > 0) {
+        enemies.forEach(enemy => {
+            enemy.updateSize(gameState.cellSize)
+            // enemy.updateBounds(gameState.grid)
+        })
+    }
 
     if (bomb.exist) {
         bomb.updateSize(gameState.cellSize);

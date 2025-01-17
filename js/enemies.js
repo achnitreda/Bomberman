@@ -1,7 +1,7 @@
 import { bomb } from "./bomb.js";
 import { gameState } from "./main.js";
 import { player } from "./player.js";
-export const enimiesNumber = 3;
+export const enimiesNumber = 1;
 const speed = 1;
 // const horz = 1, vert = -1;
 
@@ -18,7 +18,7 @@ export class Enemy {
             ver: ['y', 'top', 'bottom'],
             direction: 1
         };
-        
+
         this.bounds = {
             right: 0,
             left: 0,
@@ -39,6 +39,16 @@ export class Enemy {
         }
     }
 
+    updateSize(cellSize) {
+        this.size = cellSize * 0.8
+        const pxToCenter = Math.floor((cellSize - this.size) / 2);
+
+        this.positionInCell.x = pxToCenter
+        this.positionInCell.y = pxToCenter
+
+        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
+    }
+
     updateBounds(grid) {
         const cellSize = gameState.cellSize
         const posX = ((this.position.x + (this.size * 0.55)) / cellSize);
@@ -49,6 +59,12 @@ export class Enemy {
         this.bounds.top = Math.floor(posY) * cellSize;
         this.bounds.right = Math.ceil(posX) * cellSize;
         this.bounds.bottom = Math.ceil(posY) * cellSize;
+
+        console.log("----updateBounds-----")
+        console.log(cellSize)
+        console.log(this.position.x)
+        console.log(this.position.y)
+        console.log(this.bounds)
 
         this.updatPassability(grid)
     }
@@ -87,6 +103,18 @@ export class Enemy {
         this.axis = (Math.random() > 0.5 ? 'hor' : 'ver');
         this.updateBounds(grid);
         enimieCell.appendChild(this.element);
+
+        console.log("-------Debug-----")
+        console.log("cellSize =>", cellSize)
+        console.log("this.size =>", this.size)
+        console.log("pxToCenter =>", pxToCenter)
+        console.log("this.cell.i =>", this.cell.i)
+        console.log("this.cell.j =>", this.cell.j)
+        console.log("this.position.x =>", this.position.x)
+        console.log("this.position.y =>", this.position.y)
+        console.log("this.positionInCell.x =>", this.positionInCell.x)
+        console.log("this.positionInCell.y =>", this.positionInCell.y)
+
     }
 
     move(grid) {
