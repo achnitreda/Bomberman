@@ -46,10 +46,12 @@ const player = {
     setPlayerProperties: function (cellsize) {
         this.speed = Math.ceil(4 * cellsize / 100)
         this.size = Math.round(cellsize * 0.8);
+
         const pxToCenter = Math.floor((cellsize - this.size) * 0.5);
         this.position.x = (this.currentCell.j * cellsize) + pxToCenter;
         this.position.y = (this.currentCell.i * cellsize) + pxToCenter;
         this.sprite.framesize = this.size;
+
         this.sprite.direction = {
             down: 0,
             left: this.size,
@@ -59,6 +61,9 @@ const player = {
 
         this.element.style.backgroundSize = `${this.size * 4}px ${this.size * 4}px`
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
+
+        // update animation move during resize
+        this.element.style.backgroundPosition = `-0px -0px`;
     },
 
     updateBounds: function (grid, cellsize) {
@@ -81,6 +86,7 @@ const player = {
     },
 
     move: function (direction, grid, cellSize) {
+        console.log("move cellSize ->", cellSize)
         const pxToCenter = Math.floor((cellSize - this.size) * 0.5);
         const centerY = (Math.floor((this.position.y + (this.size * 0.5)) / cellSize) * cellSize) + pxToCenter;
         const centerX = (Math.floor((this.position.x + (this.size * 0.5)) / cellSize) * cellSize) + pxToCenter;

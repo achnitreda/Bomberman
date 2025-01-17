@@ -1,4 +1,4 @@
-import { enemy, enimiesNumber } from "./enemies.js";
+import { Enemy, enimiesNumber } from "./enemies.js";
 
 export const enemiesCells = [];
 export let gateCell = null;
@@ -25,17 +25,17 @@ function getRandomIndexes() {
     return Array.from(nums);
 }
 
-function stuck(enemy) {
-    return (enemy.axis == 'hor') ? (enemy.passability.right || enemy.passability.left) :
-        (enemy.passability.top || enemy.passability.bottom)
+function isStuck(enemy) {
+    return (enemy.axis == 'hor') ? (!enemy.passability.right && !enemy.passability.left) :
+        (!enemy.passability.top && !enemy.passability.bottom)
 }
 
 function addEnimies(grid) {
     getRandomIndexes().forEach((el) => {
         const [i, j] = enemiesCells[el];
-        const $enemy = new enemy();
+        const $enemy = new Enemy();
         $enemy.create(i, j, grid);
-        if (!stuck($enemy)) stuckEnemies.push($enemy);
+        if (isStuck($enemy)) stuckEnemies.push($enemy);
         enemies.push($enemy)
     })
 }
@@ -71,7 +71,6 @@ function mapGrid() {
     return grid;
 }
 
-
 export function mapVisual(map, player, cellSize) {
     const grid = mapGrid();
 
@@ -99,9 +98,7 @@ export function mapVisual(map, player, cellSize) {
     });
 
     addEnimies(grid);
-    console.log("enemies", enemies)
     player.updateBounds(grid, cellSize);
 
     return grid;
 }
-

@@ -1,6 +1,5 @@
 import { player } from "./player.js"
 import { gateCell, enemies, stuckEnemies } from "./map.js";
-import { cellSize } from "./main.js";
 
 export const bomb = {
     element: null,
@@ -23,6 +22,17 @@ export const bomb = {
         currentFrame: 0,
         lastUpdate: 0,
         animationSpeed: 100,
+    },
+
+    updateSize: function (cellSize) {
+        this.sprite.frameSize = cellSize * 0.8;
+        if (this.element) {
+            const pxToCenter = Math.floor((cellSize - this.sprite.frameSize) / 2);
+            this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
+
+            const x = this.sprite.currentFrame * this.sprite.frameSize;
+            this.element.style.backgroundPosition = `-${x}px 0px`;
+        }
     },
 
     animate: function (currentTime) {
@@ -57,7 +67,7 @@ export const bomb = {
         bombCell.appendChild(this.element);
     },
 
-    explosion: function (grid) {
+    explosion: function (grid, cellSize) {
         const applyExplosionEffect = (i, j) => {
             const cell = document.getElementById(`cell${i}#${j}`);
             const explosion = document.createElement('div');
