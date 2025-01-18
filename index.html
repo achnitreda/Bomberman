@@ -8,7 +8,31 @@
   </head>
   <body>
     <div id="board">
+      <div class="gameState">
+        <div class="lifes">
+          Lifes:
+          <span>3</span>
+          <span
+            ><img src="./heart.svg" width="15px" height="15px" alt="heart"
+          /></span>
+        </div>
+        <div class="timer">
+          Time:
+          <span>00.00</span>
+        </div>
+        <div class="score">
+          Score:
+          <span>0</span>
+        </div>
+      </div>
       <div id="player"></div>
+    </div>
+    <div id="win-screen" class="win-screen hidden">
+      <div class="win-popup">
+        <h2>You Win!</h2>
+        <p>Congratulations! You've defeated all enemies and escaped!</p>
+        <button onclick="location.reload()">Play Again</button>
+      </div>
     </div>
     <script type="module" src="./js/main.js"></script>
   </body>

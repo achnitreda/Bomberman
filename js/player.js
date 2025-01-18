@@ -1,9 +1,13 @@
+import { setNbOfHearts } from "./map.js";
+
 const player = {
     element: document.getElementById("player"),
     alive: true,
     size: 0,
     speed: 0,
     revive: false,
+    lifes: 3,
+    score: 0,
 
     currentCell: {
         i: 1,
@@ -235,6 +239,8 @@ const player = {
 
     death: function (cellSize) {
         if (!this.alive) return;
+        this.lifes--;
+        setNbOfHearts(this.lifes);
         this.alive = false;
         this.element.classList.remove('opacity1')
         this.element.style.backgroundPosition = `0px 0px`;

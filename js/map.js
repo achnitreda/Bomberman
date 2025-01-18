@@ -1,6 +1,7 @@
 import { Enemy, enimiesNumber } from "./enemies.js";
 
 export const enemiesCells = [];
+export const enemiesIndexes = [];
 export let gateCell = null;
 export const cellWidth = 40;
 export const cellHeight = 40;
@@ -31,12 +32,14 @@ function isStuck(enemy) {
 }
 
 function addEnimies(grid) {
-    getRandomIndexes().forEach((el) => {
+    const indexes = getRandomIndexes()
+    indexes.forEach((el) => {
         const [i, j] = enemiesCells[el];
         const $enemy = new Enemy();
         $enemy.create(i, j, grid);
         if (isStuck($enemy)) stuckEnemies.push($enemy);
         enemies.push($enemy)
+        enemiesIndexes.push([i, j])
     })
 }
 
@@ -101,4 +104,19 @@ export function mapVisual(map, player, cellSize) {
     player.updateBounds(grid, cellSize);
 
     return grid;
+}
+
+
+export function setTimer(sec, minu, timeElement) {
+    const Sec = sec % 60;
+    const Minu = minu % 60;
+    timeElement.textContent = `${Minu.toString().padStart(2, "0")}:${Sec.toString().padStart(2, "0")}`;
+}
+export function setNbOfHearts(lifes) {
+    const lifesElement = document.querySelector('.lifes span');
+    lifesElement.textContent = lifes;
+}
+export function setScore(score) {
+    const scoreElement = document.querySelector('.score span');
+    scoreElement.textContent = score;
 }

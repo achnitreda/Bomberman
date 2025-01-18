@@ -1,6 +1,9 @@
 import { bomb } from "./bomb.js";
-import { Enemy, enimiesNumber } from "./enemies.js";
-import { enemies, enemiesCells } from "./map.js";
+import { Enemy } from "./enemies.js";
+import { enemies, enemiesIndexes } from "./map.js";
+
+const MIN_CELL_SIZE = 32;
+const MAX_CELL_SIZE = 64;
 
 export function calcCellSize() {
     const windowWidth = window.innerWidth;
@@ -12,7 +15,9 @@ export function calcCellSize() {
     const cellByWidth = Math.floor(availableWidth / 15);
     const cellByHeight = Math.floor(availableHeight / 13);
 
-    const cellSize = Math.min(cellByWidth, cellByHeight)
+    let cellSize = Math.min(cellByWidth, cellByHeight)
+
+    cellSize = Math.max(MIN_CELL_SIZE, Math.min(cellSize, MAX_CELL_SIZE))
 
     document.documentElement.style.setProperty('--cellSize', `${cellSize}px`);
 
@@ -32,7 +37,11 @@ const debounce = (func, wait = 0) => {
 }
 
 export const handleResize = debounce((gameState) => {
+
+    console.log("indexes ->", enemiesIndexes)
+
     enemies.forEach(enemy => {
+        // console.log(enemy.cell)
         if (enemy.element && enemy.element.parentNode) {
             enemy.element.parentNode.removeChild(enemy.element);
         }
@@ -42,9 +51,7 @@ export const handleResize = debounce((gameState) => {
 
     gameState.cellSize = calcCellSize();
 
-    const selectedCells = enemiesCells.slice(0, enimiesNumber);
-
-    selectedCells.forEach(([i, j]) => {
+    enemiesIndexes.forEach(([i, j]) => {
         const enemy = new Enemy();
         enemy.create(i, j, gameState.grid);
         enemies.push(enemy);

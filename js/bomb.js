@@ -1,5 +1,5 @@
 import { player } from "./player.js"
-import { gateCell, enemies, stuckEnemies } from "./map.js";
+import { gateCell, enemies, stuckEnemies, enemiesIndexes, setScore } from "./map.js";
 
 export const bomb = {
     element: null,
@@ -95,12 +95,24 @@ export const bomb = {
                 }
 
                 // enimies 
+                let enemiesDied = 0;
                 enemies.forEach((enemy, index) => {
                     if (enemy.cell.i == i && enemy.cell.j == j) {
                         enemies.splice(index, 1);
+                        enemiesIndexes.splice(index, 1);
                         enemy.element.remove();
+                        player.score == 15;
+                        enemiesDied++;
                     }
                 })
+
+                if (enemiesDied >= 2) {
+                    player.score += enemiesDied * 2 * 15;
+                    setScore(player.score);
+                } else if (enemiesDied == 1) {
+                    player.score += 15;
+                    setScore(player.score);
+                }
 
                 // stuck enemies 
                 stuckEnemies.forEach(enemy => {

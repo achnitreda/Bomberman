@@ -1,4 +1,4 @@
-import { enemies, gateCell, mapVisual } from "./map.js";
+import { enemies, enemiesIndexes, gateCell, mapVisual, setTimer } from "./map.js";
 import { player } from "./player.js";
 import { bomb } from "./bomb.js";
 import { calcCellSize, handleResize } from "./responsive.js";
@@ -10,18 +10,49 @@ export const gameState = {
     placeBomb: false,
     player: player,
     grid: null,
+    gameWon: false
+}
+
+function showWinScreen() {
+    const winScreen = document.getElementById('win-screen');
+    winScreen.classList.remove('hidden');
+}
+
+function checkWinCondition() {
+    if (enemiesIndexes.length === 0 &&
+        player.currentCell.i === gateCell[0] &&
+        player.currentCell.j === gateCell[1] &&
+        !gameState.gameWon) {
+
+        gameState.gameWon = true;
+        showWinScreen()
+        return true
+    }
+    return false
 }
 
 gameState.grid = mapVisual(gameState.board, gameState.player, gameState.cellSize);
 
+const timeElement = document.querySelector(".timer span");
+let frameNb = 0;
+
 window.addEventListener('resize', () => handleResize(gameState));
 
 function gameLoop(currentTime) {
+    if (gameState.gameWon) {
+        return
+    }
+
+    const sec = Math.floor(frameNb / 60);
+    const minu = Math.floor(sec / 60);
+    setTimer(sec, minu, timeElement);
 
     if (gameState.movementKeys[0] && gameState.player.alive) {
         const direction = gameState.movementKeys[0].slice(5);
         gameState.player.move(direction, gameState.grid, gameState.cellSize);
         gameState.player.animation(currentTime, direction);
+
+        checkWinCondition()
     }
 
     if (!gameState.player.alive || gameState.player.revive) {
@@ -32,7 +63,7 @@ function gameLoop(currentTime) {
         && (gameState.player.currentCell.i != gateCell[0] || gameState.player.currentCell.j != gateCell[1])) {
         bomb.exist = true;
         bomb.create(gameState.cellSize);
-        bomb.explosion(gameState.grid,gameState.cellSize);
+        bomb.explosion(gameState.grid, gameState.cellSize);
     }
     gameState.placeBomb = false;
 
@@ -47,10 +78,12 @@ function gameLoop(currentTime) {
         })
     }
 
+    frameNb++;
     requestAnimationFrame(gameLoop)
 }
 
 document.addEventListener("keydown", (e) => {
+    if (gameState.gameWon) return
     if (e.key.startsWith('Arrow')) {
         if (!gameState.movementKeys.includes(e.key)) {
             gameState.movementKeys.unshift(e.key);
@@ -59,12 +92,14 @@ document.addEventListener("keydown", (e) => {
 })
 
 document.addEventListener("keyup", (e) => {
+    if (gameState.gameWon) return
     if (e.key.startsWith('Arrow')) {
         gameState.movementKeys.splice(gameState.movementKeys.indexOf(e.key), 1)
     }
 })
 
 document.addEventListener("keypress", e => {
+    if (gameState.gameWon) return
     if (e.key.toLowerCase() == 'z') {
         if (!bomb.exist && gameState.player.alive) gameState.placeBomb = true;
     }
