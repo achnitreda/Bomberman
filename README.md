@@ -3,7 +3,9 @@
 - TODO:
 
 ```
-When Pausing the game and putting a bomb the bomb is dissapeared
+- create when I press (Escape Esc to pause/continue ) shows me two button pause or continue the game
+- When Pausing the game and putting a bomb we should pause everything 
+- bomb | player | enemies ...
 ```
 
 when I resize and I put a bomb 

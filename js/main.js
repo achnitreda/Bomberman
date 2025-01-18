@@ -10,7 +10,8 @@ export const gameState = {
     placeBomb: false,
     player: player,
     grid: null,
-    gameWon: false
+    gameWon: false,
+    gameLost: false
 }
 
 function showWinScreen() {
@@ -31,6 +32,20 @@ function checkWinCondition() {
     return false
 }
 
+function showLoseScreen() {
+    const loseScreen = document.getElementById('lose-screen');
+    loseScreen.classList.remove('lose-hidden');
+}
+
+function checkLoseCondition() {
+    if (gameState.player.lifes === 0 && !gameState.gameLost) {
+        gameState.gameLost = true;
+        showLoseScreen();
+        return true;
+    }
+    return false;
+}
+
 gameState.grid = mapVisual(gameState.board, gameState.player, gameState.cellSize);
 
 const timeElement = document.querySelector(".timer span");
@@ -39,8 +54,8 @@ let frameNb = 0;
 window.addEventListener('resize', () => handleResize(gameState));
 
 function gameLoop(currentTime) {
-    if (gameState.gameWon) {
-        return
+    if (gameState.gameWon || gameState.gameLost) {
+        return;
     }
 
     const sec = Math.floor(frameNb / 60);
@@ -57,6 +72,7 @@ function gameLoop(currentTime) {
 
     if (!gameState.player.alive || gameState.player.revive) {
         gameState.player.deathAnimation(currentTime)
+        checkLoseCondition();
     }
 
     if (gameState.player.alive && gameState.placeBomb
@@ -83,7 +99,10 @@ function gameLoop(currentTime) {
 }
 
 document.addEventListener("keydown", (e) => {
-    if (gameState.gameWon) return
+    if (gameState.gameWon || gameState.gameLost) {
+        return;
+    }
+
     if (e.key.startsWith('Arrow')) {
         if (!gameState.movementKeys.includes(e.key)) {
             gameState.movementKeys.unshift(e.key);
@@ -92,14 +111,20 @@ document.addEventListener("keydown", (e) => {
 })
 
 document.addEventListener("keyup", (e) => {
-    if (gameState.gameWon) return
+    if (gameState.gameWon || gameState.gameLost) {
+        return;
+    }
+
     if (e.key.startsWith('Arrow')) {
         gameState.movementKeys.splice(gameState.movementKeys.indexOf(e.key), 1)
     }
 })
 
 document.addEventListener("keypress", e => {
-    if (gameState.gameWon) return
+    if (gameState.gameWon || gameState.gameLost) {
+        return;
+    }
+
     if (e.key.toLowerCase() == 'z') {
         if (!bomb.exist && gameState.player.alive) gameState.placeBomb = true;
     }

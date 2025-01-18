@@ -191,3 +191,75 @@ body {
 .hidden {
   display: none;
 }
+
+/* Lose */
+
+.lose-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.lose-popup {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  animation: shake 0.5s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.lose-popup h2 {
+  color: #ef4444;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.lose-popup p {
+  color: #4b5563;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.lose-popup button {
+  background-color: #ef4444;
+  color: white;
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.lose-popup button:hover {
+  background-color: #dc2626;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  75% {
+    transform: translateX(-10px);
+  }
+}
+
+.lose-hidden {
+  display: none;
+}

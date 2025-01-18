@@ -70,6 +70,7 @@ function mapGrid() {
 
     // random gate cell
     gateCell = softs[Math.floor(Math.random() * softs.length)];
+    // console.log(gateCell)
 
     return grid;
 }
