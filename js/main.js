@@ -24,10 +24,13 @@ function togglePause() {
 
     gameState.isPaused = !gameState.isPaused;
     pauseMenu.classList.toggle('pausehidden');
+    if (gameState.isPaused && bomb.exist) {
+        clearTimeout(bomb.timerId);
+    }
 
     if (!gameState.isPaused) {
         if (bomb.exist) {
-            bomb.handleResume(gameState.grid, gameState.cellSize);
+            bomb.timerId = setTimeout(() => bomb.explode = true, 1500)
         }
         requestAnimationFrame(gameLoop);
     }
@@ -115,9 +118,14 @@ function gameLoop(currentTime) {
     if (gameState.player.alive && gameState.placeBomb
         && (gameState.player.currentCell.i != gateCell[0] || gameState.player.currentCell.j != gateCell[1])) {
         bomb.exist = true;
-        bomb.create(gameState.cellSize);
-        bomb.explosion(gameState.grid, gameState.cellSize);
+        bomb.create(gameState.cellSize);  
     }
+
+    if (bomb.explode) {
+        bomb.explosion(gameState.grid, gameState.cellSize);
+        bomb.explode = false;
+    }
+
     gameState.placeBomb = false;
 
     if (bomb.exist) {

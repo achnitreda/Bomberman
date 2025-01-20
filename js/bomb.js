@@ -5,8 +5,9 @@ import { gameState } from "./main.js";
 export const bomb = {
     element: null,
     exist: false,
-
+    explode : false,
     cell: null,
+    timerId: null,
 
     cellsAffected: {
         center: null,
@@ -65,23 +66,24 @@ export const bomb = {
         this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px`;
 
         bombCell.appendChild(this.element);
+        this.timerId = setTimeout( () => {
+            this.explode = true;
+        }, 1500)
+    },
+
+    applyExplosionEffect : (i, j) => {
+        const cell = document.getElementById(`cell${i}#${j}`);
+        const explosion = document.createElement('div');
+        explosion.classList.add('explosion-effect');
+        cell.appendChild(explosion);
     },
 
     explosion: function (grid, cellSize) {
-        const applyExplosionEffect = (i, j) => {
-            const cell = document.getElementById(`cell${i}#${j}`);
-            const explosion = document.createElement('div');
-            explosion.classList.add('explosion-effect');
-            cell.appendChild(explosion);
-        };
-
-        setTimeout(() => {
-            if (!gameState.isPaused) {
                 for (let cell in this.cellsAffected) {
                     const [i, j] = this.cellsAffected[cell];
 
                     if (grid[i][j] == 1 || grid[i][j] === 0) {
-                        applyExplosionEffect(i, j);
+                        this.applyExplosionEffect(i, j);
                         const cell = document.getElementById(`cell${i}#${j}`);
 
                         // gate cell
@@ -124,11 +126,5 @@ export const bomb = {
                 this.cell = null;
                 this.element.style.opacity = '0';
                 this.exist = false;
-            }
-        }, 1500)
     },
-
-    handleResume: function (grid, cellSize) {
-        this.explosion(grid, cellSize);
-    }
 }
