@@ -4,7 +4,6 @@ import { gameState } from "./main.js";
 
 export const bomb = {
     element: null,
-    explosionTimer: null,
     exist: false,
 
     cell: null,
@@ -76,13 +75,7 @@ export const bomb = {
             cell.appendChild(explosion);
         };
 
-        if (this.explosionTimer) {
-            clearTimeout(this.explosionTimer);
-        }
-
-        this.explosionStartTime = Date.now();
-
-        this.explosionTimer = setTimeout(() => {
+        setTimeout(() => {
             if (!gameState.isPaused) {
                 for (let cell in this.cellsAffected) {
                     const [i, j] = this.cellsAffected[cell];
@@ -135,19 +128,7 @@ export const bomb = {
         }, 1500)
     },
 
-    handlePause: function () {
-        if (this.explosionTimer) {
-            clearTimeout(this.explosionTimer);
-            const elapsed = Date.now() - this.explosionStartTime;
-            const remaining = Math.max(1500 - elapsed, 0);
-            this.remainingExplosionTime = remaining;
-        }
-    },
-
     handleResume: function (grid, cellSize) {
-        this.explosionTimer = setTimeout(() => {
-            this.explosion(grid, cellSize);
-        }, this.remainingExplosionTime);
-        this.remainingExplosionTime = null;
+        this.explosion(grid, cellSize);
     }
 }

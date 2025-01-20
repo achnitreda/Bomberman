@@ -25,11 +25,7 @@ function togglePause() {
     gameState.isPaused = !gameState.isPaused;
     pauseMenu.classList.toggle('pausehidden');
 
-    if (gameState.isPaused) {
-        if (bomb.exist) {
-            bomb.handlePause();
-        }
-    } else {
+    if (!gameState.isPaused) {
         if (bomb.exist) {
             bomb.handleResume(gameState.grid, gameState.cellSize);
         }
