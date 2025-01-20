@@ -1,9 +1,10 @@
 import { player } from "./player.js"
 import { gateCell, enemies, stuckEnemies, enemiesIndexes, setScore } from "./map.js";
+import { gameState } from "./main.js";
 
 export const bomb = {
     element: null,
-
+    explosionTimer: null,
     exist: false,
 
     cell: null,
@@ -75,60 +76,78 @@ export const bomb = {
             cell.appendChild(explosion);
         };
 
+        if (this.explosionTimer) {
+            clearTimeout(this.explosionTimer);
+        }
 
-        setTimeout(() => {
-            for (let cell in this.cellsAffected) {
-                const [i, j] = this.cellsAffected[cell];
+        this.explosionStartTime = Date.now();
 
-                if (grid[i][j] == 1 || grid[i][j] === 0) {
-                    applyExplosionEffect(i, j);
-                    const cell = document.getElementById(`cell${i}#${j}`);
+        this.explosionTimer = setTimeout(() => {
+            if (!gameState.isPaused) {
+                for (let cell in this.cellsAffected) {
+                    const [i, j] = this.cellsAffected[cell];
 
-                    // gate cell
-                    cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
-                    grid[i][j] = 0;
-                }
+                    if (grid[i][j] == 1 || grid[i][j] === 0) {
+                        applyExplosionEffect(i, j);
+                        const cell = document.getElementById(`cell${i}#${j}`);
 
-                //player
-                if ((player.currentCell.i == i && player.currentCell.j == j)) {
-                    player.death(cellSize);
-                }
-
-                // enimies 
-                let enemiesDied = 0;
-                enemies.forEach((enemy, index) => {
-                    if (enemy.cell.i == i && enemy.cell.j == j) {
-                        enemies.splice(index, 1);
-                        enemiesIndexes.splice(index, 1);
-                        enemy.element.remove();
-                        player.score == 15;
-                        enemiesDied++;
+                        // gate cell
+                        cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
+                        grid[i][j] = 0;
                     }
-                })
 
-                if (enemiesDied >= 2) {
-                    player.score += enemiesDied * 2 * 15;
-                    setScore(player.score);
-                } else if (enemiesDied == 1) {
-                    player.score += 15;
-                    setScore(player.score);
+                    //player
+                    if ((player.currentCell.i == i && player.currentCell.j == j)) {
+                        player.death(cellSize);
+                    }
+
+                    // enimies 
+                    let enemiesDied = 0;
+                    enemies.forEach((enemy, index) => {
+                        if (enemy.cell.i == i && enemy.cell.j == j) {
+                            enemies.splice(index, 1);
+                            enemiesIndexes.splice(index, 1);
+                            enemy.element.remove();
+                            player.score == 15;
+                            enemiesDied++;
+                        }
+                    })
+
+                    if (enemiesDied >= 2) {
+                        player.score += enemiesDied * 2 * 15;
+                        setScore(player.score);
+                    } else if (enemiesDied == 1) {
+                        player.score += 15;
+                        setScore(player.score);
+                    }
+
+                    // stuck enemies 
+                    stuckEnemies.forEach(enemy => {
+                        enemy.updateBounds(grid)
+                    })
+
                 }
 
-                // stuck enemies 
-                stuckEnemies.forEach(enemy => {
-                    enemy.updateBounds(grid)
-                })
-
+                this.cell = null;
+                this.element.style.opacity = '0';
+                this.exist = false;
             }
-
-            this.cell = null;
-            /**
-             * TODO:
-             * element should be removed
-             * for performance reasons
-             */
-            this.element.style.opacity = '0';
-            this.exist = false;
         }, 1500)
     },
+
+    handlePause: function () {
+        if (this.explosionTimer) {
+            clearTimeout(this.explosionTimer);
+            const elapsed = Date.now() - this.explosionStartTime;
+            const remaining = Math.max(1500 - elapsed, 0);
+            this.remainingExplosionTime = remaining;
+        }
+    },
+
+    handleResume: function (grid, cellSize) {
+        this.explosionTimer = setTimeout(() => {
+            this.explosion(grid, cellSize);
+        }, this.remainingExplosionTime);
+        this.remainingExplosionTime = null;
+    }
 }

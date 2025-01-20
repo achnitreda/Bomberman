@@ -11,8 +11,45 @@ export const gameState = {
     player: player,
     grid: null,
     gameWon: false,
-    gameLost: false
+    gameLost: false,
+    isPaused: false,
 }
+
+const pauseMenu = document.getElementById('pause-menu');
+const continueBtn = document.getElementById('continue-btn');
+const restartBtn = document.getElementById('restart-btn');
+
+function togglePause() {
+    if (gameState.gameWon || gameState.gameLost) return;
+
+    gameState.isPaused = !gameState.isPaused;
+    pauseMenu.classList.toggle('pausehidden');
+
+    if (gameState.isPaused) {
+        if (bomb.exist) {
+            bomb.handlePause();
+        }
+    } else {
+        if (bomb.exist) {
+            bomb.handleResume(gameState.grid, gameState.cellSize);
+        }
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+function restartGame() {
+    location.reload();
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        togglePause();
+    }
+});
+
+continueBtn.addEventListener('click', togglePause);
+restartBtn.addEventListener('click', restartGame);
+
 
 function showWinScreen() {
     const winScreen = document.getElementById('win-screen');
@@ -55,6 +92,10 @@ window.addEventListener('resize', () => handleResize(gameState));
 
 function gameLoop(currentTime) {
     if (gameState.gameWon || gameState.gameLost) {
+        return;
+    }
+
+    if (gameState.isPaused) {
         return;
     }
 
