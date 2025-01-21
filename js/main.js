@@ -4,6 +4,7 @@ import { bomb } from "./bomb.js";
 import { calcCellSize, handleResize } from "./responsive.js";
 
 export const gameState = {
+    stage: 1,
     cellSize: calcCellSize(),
     board: document.getElementById('board'),
     movementKeys: [],

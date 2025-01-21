@@ -5,7 +5,9 @@ import { enemies, enemiesIndexes } from "./map.js";
 const MIN_CELL_SIZE = 32;
 const MAX_CELL_SIZE = 64;
 
-export function calcCellSize() {
+export function calcCellSize(stage) {
+    if (!stage) stage = 0;
+
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -20,6 +22,7 @@ export function calcCellSize() {
     cellSize = Math.max(MIN_CELL_SIZE, Math.min(cellSize, MAX_CELL_SIZE))
 
     document.documentElement.style.setProperty('--cellSize', `${cellSize}px`);
+    document.documentElement.style.setProperty('--stage', `${stage}px`);
 
     return cellSize
 }
@@ -36,9 +39,33 @@ const debounce = (func, wait = 0) => {
     }
 }
 
+function setPositions(grid, stage, cellSize) {
+    document.querySelector('.empty').forEach(el => console.log(el));
+    
+
+
+
+        grid.forEach((row) => {
+        row.forEach((el) => {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            if (el == 3) {
+                cell.style.backgroundPosition = `${-2*cellSize}px ${-(stage*cellSize)}px`;
+            } else if (el == 2) {
+                cell.style.backgroundPosition = `0px ${-(stage*cellSize)}px`;
+            } else if (el == 1) {
+                cell.style.backgroundPosition = `${-3*cellSize}px ${-(stage*cellSize)}px`;
+            } else {
+                cell.style.backgroundPosition = `${-1*cellSize}px ${-(stage*cellSize)}px`;
+            }
+        })
+    });
+}
+
 export const handleResize = debounce((gameState) => {
 
-    console.log("indexes ->", enemiesIndexes)
+    console.log(console.log(gameState.grid));
+    
 
     enemies.forEach(enemy => {
         // console.log(enemy.cell)
@@ -50,6 +77,8 @@ export const handleResize = debounce((gameState) => {
     enemies.length = 0;
 
     gameState.cellSize = calcCellSize();
+    setPositions(gameState.grid, gameState.stage, gameState.cellSize);
+
 
     enemiesIndexes.forEach(([i, j]) => {
         const enemy = new Enemy();

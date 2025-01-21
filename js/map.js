@@ -1,15 +1,15 @@
 import { Enemy, enimiesNumber } from "./enemies.js";
+import { gameState } from "./main.js";
 
 export const enemiesCells = [];
 export const enemiesIndexes = [];
 export let gateCell = null;
-export const cellWidth = 40;
-export const cellHeight = 40;
 const mapWidth = 15;
 const mapHeight = 13;
 const empty = 0;
 const soft = 1;
 const solid = 2;
+const specialSolid = 3;
 const softs = [];
 export const enemies = [];
 export const stuckEnemies = [];
@@ -48,15 +48,19 @@ function mapGrid() {
     for (let i = 0; i < mapHeight; i++) {
         grid[i] = [];
         for (let j = 0; j < mapWidth; j++) {
-            if (i == 0 || i == mapHeight - 1 || j == 0 || j == mapWidth - 1) {
-                // corners
+
+            if (i == 0 && j == 0 || i == mapHeight-1 && j == 0 || j == mapWidth-1 && i == 0 || j == mapWidth-1 && i == mapHeight-1) {
+                // corners cells
+                grid[i][j] = specialSolid;
+            } else if (i == 0 || i == mapHeight - 1 || j == 0 || j == mapWidth - 1) {
+                // walls
                 grid[i][j] = solid;
             } else if (i == 1 && j == 1 || i == 1 && j == 2 || i == 2 && j == 1) {
                 // ensure player right and bottom cells are empty 
                 grid[i][j] = empty;
             } else if (i % 2 == 0 && j % 2 == 0) {
                 // solide blocks inside the map
-                grid[i][j] = solid;
+                grid[i][j] = specialSolid;
             } else {
                 // random blocks either soft or empty 
                 const rand = randomNumber();
@@ -70,27 +74,30 @@ function mapGrid() {
 
     // random gate cell
     gateCell = softs[Math.floor(Math.random() * softs.length)];
-    // console.log(gateCell)
-
+    console.log(gateCell);
+    
     return grid;
 }
 
 export function mapVisual(map, player, cellSize) {
     const grid = mapGrid();
-
+    console.log(cellSize);
+    
     // player properties
     player.setPlayerProperties(cellSize);
 
     grid.forEach((row, i) => {
         row.forEach((el, j) => {
             const cell = document.createElement('div');
-            cell.classList.add('cell')
-            if (el == solid) {
-                cell.classList.add('solidWall')
+            cell.classList.add('cell');
+            if (el == specialSolid) {
+                cell.style.backgroundPosition = `${-2*cellSize}px ${-(gameState.stage*cellSize)}px`;
+            } else if (el == solid) {
+                cell.style.backgroundPosition = `0px ${-(gameState.stage*cellSize)}px`;
             } else if (el == soft) {
-                cell.classList.add('softWall')
+                cell.style.backgroundPosition = `${-3*cellSize}px ${-(gameState.stage*cellSize)}px`;
             } else {
-                cell.classList.add('empty')
+                cell.style.backgroundPosition = `${-1*cellSize}px ${-(gameState.stage*cellSize)}px`;
                 if (i >= 2 && j > 1 && (i + 1) % 2 == 0 && (j + 1) % 2 == 0) {
                     enemiesCells.push([i, j])
                 }

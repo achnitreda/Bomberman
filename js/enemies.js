@@ -2,7 +2,8 @@ import { bomb } from "./bomb.js";
 import { gameState } from "./main.js";
 import { player } from "./player.js";
 export const enimiesNumber = 3;
-const speed = 1;
+const speed = 0.8;
+
 export class Enemy {
     constructor() {
         this.element = null;

@@ -82,11 +82,21 @@ export const bomb = {
                 for (let cell in this.cellsAffected) {
                     const [i, j] = this.cellsAffected[cell];
 
-                    if (grid[i][j] == 1 || grid[i][j] === 0) {
+                    if (grid[i][j] == 1 || grid[i][j] == 0) {
                         this.applyExplosionEffect(i, j);
                         const cell = document.getElementById(`cell${i}#${j}`);
 
                         // gate cell
+                        if (i == gateCell[0] && j == gateCell[1]) {
+                            cell.classList = "cell gate";
+                            cell.style.backgroundImage = 'none';
+                        } else {
+                            if (gameState.stage == 1) {
+                                cell.style.backgroundPosition = `0px ${-(gameState.stage-1)*cellSize}px`
+                            } else {
+                                cell.style.backgroundPosition = `${-cellSize}px ${-(gameState.stage-1)*cellSize}px`
+                            }
+                        }
                         cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
                         grid[i][j] = 0;
                     }

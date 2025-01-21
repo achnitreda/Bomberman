@@ -51,21 +51,24 @@ body {
   position: relative;
   width: var(--cellSize);
   height: var(--cellSize);
-  border: 1px solid gray;
+  background-image: url("./mapTileSet_v1.png");
+  background-size: calc(var(--cellSize) * 4) calc(var(--cellSize) * 3);
+}
+
+.solid {
+  background-position: 0px calc(var(--stage) * var(--cellSize) * -1);
 }
 
 .empty {
-  background-color: rgb(3, 168, 113);
+  background-position: calc(var(--cellSize) * -1) calc(var(--stage) * var(--cellSize) * -1);
 }
 
-.solidWall {
-  background-color: rgb(29, 28, 28);
+.spSolid {
+  background-position: calc(var(--cellSize) * -2) calc(var(--stage) * var(--cellSize) * -1);
 }
 
-.softWall {
-  background: #c64f36;
-  border: 3px solid #7a3121;
-  box-shadow: inset 0 0 8px #7a3121;
+.soft {
+  background-position: calc(var(--cellSize) * -3) calc(var(--stage) * var(--cellSize) * -1);
 }
 
 .bomb {
