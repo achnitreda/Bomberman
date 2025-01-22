@@ -1,8 +1,8 @@
-import { Enemy, enimiesNumber } from "./enemies.js";
+import { Enemy } from "./enemies.js";
 import { gameState } from "./main.js";
 
-export const enemiesCells = [];
-export const enemiesIndexes = [];
+export let enemiesCells = [];
+// export const enemiesIndexes = [];
 export let gateCell = null;
 const mapWidth = 15;
 const mapHeight = 13;
@@ -20,7 +20,7 @@ function randomNumber() {
 
 function getRandomIndexes() {
     const nums = new Set();
-    while (nums.size < enimiesNumber) {
+    while (nums.size < gameState.enimiesNumber) {
         nums.add(Math.floor(Math.random() * enemiesCells.length));
     }
     return Array.from(nums);
@@ -33,13 +33,19 @@ function isStuck(enemy) {
 
 function addEnimies(grid) {
     const indexes = getRandomIndexes()
+    // console.log(enemiesCells);
+    
+    // console.log(indexes);
+    
     indexes.forEach((el) => {
         const [i, j] = enemiesCells[el];
+        // console.log(i, j);
         const $enemy = new Enemy();
+        // console.log(document.getElementById(`cell${i}#${j}`));
         $enemy.create(i, j, grid);
         if (isStuck($enemy)) stuckEnemies.push($enemy);
         enemies.push($enemy)
-        enemiesIndexes.push([i, j])
+        // enemiesIndexes.push([i, j])
     })
 }
 
@@ -79,37 +85,49 @@ function mapGrid() {
     return grid;
 }
 
-export function mapVisual(map, player, cellSize) {
+export function mapVisual() {
     const grid = mapGrid();
-    console.log(cellSize);
+    // console.log(grid);
     
     // player properties
-    player.setPlayerProperties(cellSize);
-
+    console.log(gameState.cellSize);
+    
+    gameState.player.setPlayerProperties(gameState.cellSize);
+    
+    enemiesCells = [];
     grid.forEach((row, i) => {
         row.forEach((el, j) => {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             if (el == specialSolid) {
-                cell.style.backgroundPosition = `${-2*cellSize}px ${-(gameState.stage*cellSize)}px`;
+                cell.classList.add('spSolid');
+                cell.style.backgroundPosition = `${-2*gameState.cellSize}px ${-(gameState.stage*gameState.cellSize)}px`;
             } else if (el == solid) {
-                cell.style.backgroundPosition = `0px ${-(gameState.stage*cellSize)}px`;
+                cell.classList.add('solid');
+                cell.style.backgroundPosition = `0px ${-(gameState.stage*gameState.cellSize)}px`;
             } else if (el == soft) {
-                cell.style.backgroundPosition = `${-3*cellSize}px ${-(gameState.stage*cellSize)}px`;
+                cell.classList.add('soft');
+                cell.style.backgroundPosition = `${-3*gameState.cellSize}px ${-(gameState.stage*gameState.cellSize)}px`;
             } else {
-                cell.style.backgroundPosition = `${-1*cellSize}px ${-(gameState.stage*cellSize)}px`;
+                cell.classList.add('empty');
+                cell.style.backgroundPosition = `${-1*gameState.cellSize}px ${-(gameState.stage*gameState.cellSize)}px`;
                 if (i >= 2 && j > 1 && (i + 1) % 2 == 0 && (j + 1) % 2 == 0) {
                     enemiesCells.push([i, j])
                 }
             }
 
-            cell.id = `cell${i}#${j}`
-            map.appendChild(cell)
+            cell.id = `cell${i}#${j}`;
+            gameState.board.appendChild(cell)
         })
     });
 
     addEnimies(grid);
-    player.updateBounds(grid, cellSize);
+    // enemiesCells.forEach(([i, j]) => {
+    //     console.log(grid[i][j])
+        
+    // })
+    
+    gameState.player.updateBounds(grid, gameState.cellSize);
 
     return grid;
 }

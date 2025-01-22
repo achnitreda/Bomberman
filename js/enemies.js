@@ -1,13 +1,14 @@
 import { bomb } from "./bomb.js";
 import { gameState } from "./main.js";
 import { player } from "./player.js";
-export const enimiesNumber = 3;
-const speed = 0.8;
+
 
 export class Enemy {
     constructor() {
         this.element = null;
+        this.speed = 0;
         this.cell = { i: 0, j: 0 };
+        this.initCell = { i: 0, j: 0};
         this.size = 0;
         this.position = { x: 0, y: 0 };
         this.positionInCell = { x: 0, y: 0 };
@@ -39,15 +40,16 @@ export class Enemy {
     }
 
     setEnemyProperties(cellSize) {
-        this.size = cellSize * 0.8;
+        this.speed = cellSize / 40;
+        this.size = Math.floor(cellSize * 0.8);
         const pxToCenter = Math.floor((cellSize - this.size) / 2);
 
-        this.position.x = cellSize * this.cell.j + pxToCenter;
-        this.position.y = cellSize * this.cell.i + pxToCenter;
+        this.position.x = cellSize * this.initCell.j + pxToCenter;
+        this.position.y = cellSize * this.initCell.i + pxToCenter;
 
         this.positionInCell.x = pxToCenter;
         this.positionInCell.y = pxToCenter;
-
+        
         if (this.element) {
             this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
         }
@@ -91,6 +93,8 @@ export class Enemy {
 
         this.cell.i = i;
         this.cell.j = j;
+        this.initCell.i = i;
+        this.initCell.j = j;
 
         this.setEnemyProperties(cellSize);
 
@@ -103,13 +107,13 @@ export class Enemy {
         const cellSize = gameState.cellSize
 
         if (this.moveEntries.direction == 1) {
-            if (this.position[this.moveEntries[this.axis][0]] + this.size + speed <= this.bounds[this.moveEntries[this.axis][2]]) {
-                this.position[this.moveEntries[this.axis][0]] += speed;
-                this.positionInCell[this.moveEntries[this.axis][0]] += speed;
+            if (this.position[this.moveEntries[this.axis][0]] + this.size + this.speed <= this.bounds[this.moveEntries[this.axis][2]]) {
+                this.position[this.moveEntries[this.axis][0]] += this.speed;
+                this.positionInCell[this.moveEntries[this.axis][0]] += this.speed;
             } else {
                 if (this.passability[this.moveEntries[this.axis][2]]) {
-                    this.position[this.moveEntries[this.axis][0]] += speed;
-                    this.positionInCell[this.moveEntries[this.axis][0]] += speed;
+                    this.position[this.moveEntries[this.axis][0]] += this.speed;
+                    this.positionInCell[this.moveEntries[this.axis][0]] += this.speed;
                     if (this.axis == 'hor') {
                         if (bomb.cell && (this.cell.j + 1 == bomb.cell.j && this.cell.i == bomb.cell.i)) {
                             this.moveEntries.direction = -1
@@ -128,14 +132,14 @@ export class Enemy {
                 this.updateBounds(grid);
             }
         } else {
-            if (this.position[this.moveEntries[this.axis][0]] - speed >= this.bounds[this.moveEntries[this.axis][1]]) {
-                this.position[this.moveEntries[this.axis][0]] -= speed;
-                this.positionInCell[this.moveEntries[this.axis][0]] -= speed;
+            if (this.position[this.moveEntries[this.axis][0]] - this.speed >= this.bounds[this.moveEntries[this.axis][1]]) {
+                this.position[this.moveEntries[this.axis][0]] -= this.speed;
+                this.positionInCell[this.moveEntries[this.axis][0]] -= this.speed;
 
             } else {
                 if (this.passability[this.moveEntries[this.axis][1]]) {
-                    this.position[this.moveEntries[this.axis][0]] -= speed;
-                    this.positionInCell[this.moveEntries[this.axis][0]] -= speed;
+                    this.position[this.moveEntries[this.axis][0]] -= this.speed;
+                    this.positionInCell[this.moveEntries[this.axis][0]] -= this.speed;
                     if (this.axis == 'hor') {
                         if (bomb.cell && (this.cell.j - 1 == bomb.cell.j && this.cell.i == bomb.cell.i)) {
                             this.moveEntries.direction = 1
@@ -174,13 +178,6 @@ export class Enemy {
     }
 
     collisionWithplayer() {
-        const enemyRect = this.element.getBoundingClientRect();
-        const playerRect = player.element.getBoundingClientRect();
-
-        return !(enemyRect.right < playerRect.left ||
-            enemyRect.left > playerRect.right ||
-            enemyRect.bottom < playerRect.top ||
-            enemyRect.top > playerRect.bottom);
+        return player.currentCell.i == this.cell.i && player.currentCell.j == this.cell.j;
     }
-
 }

@@ -34,6 +34,10 @@ body {
 
 #board {
   position: relative;
+}
+
+#map {
+  position: relative;
   display: grid;
   grid-template-rows: repeat(13, var(--cellSize));
   grid-template-columns: repeat(15, var(--cellSize));
@@ -131,7 +135,7 @@ body {
 
 /* win */
 
-.win-screen {
+.win-screen, .level-win {
   position: fixed;
   top: 0;
   left: 0;

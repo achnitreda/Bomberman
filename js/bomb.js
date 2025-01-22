@@ -1,5 +1,5 @@
 import { player } from "./player.js"
-import { gateCell, enemies, stuckEnemies, enemiesIndexes, setScore } from "./map.js";
+import { gateCell, enemies, stuckEnemies, setScore } from "./map.js";
 import { gameState } from "./main.js";
 
 export const bomb = {
@@ -91,11 +91,7 @@ export const bomb = {
                             cell.classList = "cell gate";
                             cell.style.backgroundImage = 'none';
                         } else {
-                            if (gameState.stage == 1) {
-                                cell.style.backgroundPosition = `0px ${-(gameState.stage-1)*cellSize}px`
-                            } else {
-                                cell.style.backgroundPosition = `${-cellSize}px ${-(gameState.stage-1)*cellSize}px`
-                            }
+                            cell.style.backgroundPosition = `${-cellSize}px ${-(gameState.stage)*cellSize}px`;
                         }
                         cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
                         grid[i][j] = 0;
@@ -111,7 +107,7 @@ export const bomb = {
                     enemies.forEach((enemy, index) => {
                         if (enemy.cell.i == i && enemy.cell.j == j) {
                             enemies.splice(index, 1);
-                            enemiesIndexes.splice(index, 1);
+                            // enemiesIndexes.splice(index, 1);
                             enemy.element.remove();
                             player.score == 15;
                             enemiesDied++;

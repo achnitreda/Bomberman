@@ -1,12 +1,17 @@
-import { enemies, enemiesIndexes, gateCell, mapVisual, setTimer } from "./map.js";
+import { enemies, gateCell, mapVisual, setTimer } from "./map.js";
 import { player } from "./player.js";
 import { bomb } from "./bomb.js";
-import { calcCellSize, handleResize } from "./responsive.js";
+import { calcCellSize } from "./responsive.js";
+import { setEvents } from "./events.js";
+import { checkLoseCondition, checkWinCondition, checkLevelWinCondition } from "./gameProgress.js";
 
 export const gameState = {
-    stage: 1,
+    stage: 0,
+    enimiesNumber: 3,
     cellSize: calcCellSize(),
-    board: document.getElementById('board'),
+    board: document.getElementById('map'),
+    timeElement : document.querySelector(".timer span"),
+    framesNb : 0,
     movementKeys: [],
     placeBomb: false,
     player: player,
@@ -16,104 +21,26 @@ export const gameState = {
     isPaused: false,
 }
 
-const pauseMenu = document.getElementById('pause-menu');
-const continueBtn = document.getElementById('continue-btn');
-const restartBtn = document.getElementById('restart-btn');
-
-function togglePause() {
-    if (gameState.gameWon || gameState.gameLost) return;
-
-    gameState.isPaused = !gameState.isPaused;
-    pauseMenu.classList.toggle('pausehidden');
-    if (gameState.isPaused && bomb.exist) {
-        clearTimeout(bomb.timerId);
-    }
-
-    if (!gameState.isPaused) {
-        if (bomb.exist) {
-            bomb.timerId = setTimeout(() => bomb.explode = true, 1500)
-        }
-        requestAnimationFrame(gameLoop);
-    }
-}
-
-function restartGame() {
-    location.reload();
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        togglePause();
-    }
-});
-
-continueBtn.addEventListener('click', togglePause);
-restartBtn.addEventListener('click', restartGame);
-
-
-function showWinScreen() {
-    const winScreen = document.getElementById('win-screen');
-    winScreen.classList.remove('hidden');
-}
-
-function checkWinCondition() {
-    if (enemiesIndexes.length === 0 &&
-        player.currentCell.i === gateCell[0] &&
-        player.currentCell.j === gateCell[1] &&
-        !gameState.gameWon) {
-
-        gameState.gameWon = true;
-        showWinScreen()
-        return true
-    }
-    return false
-}
-
-function showLoseScreen() {
-    const loseScreen = document.getElementById('lose-screen');
-    loseScreen.classList.remove('lose-hidden');
-}
-
-function checkLoseCondition() {
-    if (gameState.player.lifes === 0 && !gameState.gameLost) {
-        gameState.gameLost = true;
-        showLoseScreen();
-        return true;
-    }
-    return false;
-}
-
-gameState.grid = mapVisual(gameState.board, gameState.player, gameState.cellSize);
-
-const timeElement = document.querySelector(".timer span");
-let frameNb = 0;
-
-window.addEventListener('resize', () => handleResize(gameState));
-
-function gameLoop(currentTime) {
-    if (gameState.gameWon || gameState.gameLost) {
+export function gameLoop(currentTime) {
+    if (gameState.gameWon || gameState.gameLost || gameState.isPaused) {
         return;
     }
 
-    if (gameState.isPaused) {
-        return;
-    }
-
-    const sec = Math.floor(frameNb / 60);
+    const sec = Math.floor(gameState.framesNb / 60);
     const minu = Math.floor(sec / 60);
-    setTimer(sec, minu, timeElement);
+    setTimer(sec, minu, gameState.timeElement);
 
     if (gameState.movementKeys[0] && gameState.player.alive) {
         const direction = gameState.movementKeys[0].slice(5);
         gameState.player.move(direction, gameState.grid, gameState.cellSize);
         gameState.player.animation(currentTime, direction);
-
-        checkWinCondition()
+        if (gameState.stage == 2) checkWinCondition(gameState, enemies, gateCell);
+        else checkLevelWinCondition(gameState, enemies, gateCell);
     }
 
     if (!gameState.player.alive || gameState.player.revive) {
         gameState.player.deathAnimation(currentTime)
-        checkLoseCondition();
+        checkLoseCondition(gameState);
     }
 
     if (gameState.player.alive && gameState.placeBomb
@@ -126,7 +53,6 @@ function gameLoop(currentTime) {
         bomb.explosion(gameState.grid, gameState.cellSize);
         bomb.explode = false;
     }
-
     gameState.placeBomb = false;
 
     if (bomb.exist) {
@@ -135,45 +61,19 @@ function gameLoop(currentTime) {
 
     if (enemies.length > 0) {
         enemies.forEach(enemy => {
-            enemy.move(gameState.grid);
+            // enemy.move(gameState.grid);
             enemy.animate(currentTime);
         })
     }
 
-    frameNb++;
+    gameState.framesNb++;
     requestAnimationFrame(gameLoop)
 }
 
-document.addEventListener("keydown", (e) => {
-    if (gameState.gameWon || gameState.gameLost) {
-        return;
-    }
+function startGame() {
+    setEvents();
+    gameState.grid = mapVisual();
+    requestAnimationFrame(gameLoop);
+}
 
-    if (e.key.startsWith('Arrow')) {
-        if (!gameState.movementKeys.includes(e.key)) {
-            gameState.movementKeys.unshift(e.key);
-        }
-    }
-})
-
-document.addEventListener("keyup", (e) => {
-    if (gameState.gameWon || gameState.gameLost) {
-        return;
-    }
-
-    if (e.key.startsWith('Arrow')) {
-        gameState.movementKeys.splice(gameState.movementKeys.indexOf(e.key), 1)
-    }
-})
-
-document.addEventListener("keypress", e => {
-    if (gameState.gameWon || gameState.gameLost) {
-        return;
-    }
-
-    if (e.key.toLowerCase() == 'z') {
-        if (!bomb.exist && gameState.player.alive) gameState.placeBomb = true;
-    }
-})
-
-requestAnimationFrame(gameLoop)
+startGame();

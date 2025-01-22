@@ -48,7 +48,9 @@ const player = {
     },
 
     setPlayerProperties: function (cellsize) {
-        this.speed = Math.ceil(4 * cellsize / 100)
+        this.speed = cellsize / 20;
+        console.log(this.speed);
+        
         this.size = Math.round(cellsize * 0.8);
 
         const pxToCenter = Math.floor((cellsize - this.size) * 0.5);
@@ -259,6 +261,8 @@ const player = {
             }, 2000)
         }, 2000)
     }
+
+    
 }
 
 export { player };
