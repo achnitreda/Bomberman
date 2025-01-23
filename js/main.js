@@ -8,6 +8,7 @@ import { checkLoseCondition, checkWinCondition, checkLevelWinCondition } from ".
 export const gameState = {
     stage: 0,
     enimiesNumber: 3,
+    storyTime: false,
     cellSize: calcCellSize(),
     board: document.getElementById('map'),
     timeElement : document.querySelector(".timer span"),
@@ -22,7 +23,7 @@ export const gameState = {
 }
 
 export function gameLoop(currentTime) {
-    if (gameState.gameWon || gameState.gameLost || gameState.isPaused) {
+    if (gameState.gameWon || gameState.gameLost || gameState.isPaused || gameState.storyTime) {
         return;
     }
 
@@ -61,7 +62,7 @@ export function gameLoop(currentTime) {
 
     if (enemies.length > 0) {
         enemies.forEach(enemy => {
-            // enemy.move(gameState.grid);
+            enemy.move(gameState.grid);
             enemy.animate(currentTime);
         })
     }

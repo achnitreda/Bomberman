@@ -2,7 +2,6 @@ import { Enemy } from "./enemies.js";
 import { gameState } from "./main.js";
 
 export let enemiesCells = [];
-// export const enemiesIndexes = [];
 export let gateCell = null;
 const mapWidth = 15;
 const mapHeight = 13;
@@ -10,7 +9,7 @@ const empty = 0;
 const soft = 1;
 const solid = 2;
 const specialSolid = 3;
-const softs = [];
+let softs = [];
 export const enemies = [];
 export const stuckEnemies = [];
 
@@ -18,44 +17,53 @@ function randomNumber() {
     return (Math.random() < 0.6) ? empty : soft
 }
 
-function getRandomIndexes() {
-    const nums = new Set();
-    while (nums.size < gameState.enimiesNumber) {
-        nums.add(Math.floor(Math.random() * enemiesCells.length));
-    }
-    return Array.from(nums);
+function stuckPosition(grid, i, j) {
+    return (grid[i][j + 1] != 0 && grid[i][j - 1] != 0
+        &&  grid[i + 1][j] != 0 && grid[i - 1][j] != 0)
+}
+    
+function getRandomIndexes(grid) {
+        const nums = new Set();
+        while (nums.size < gameState.enimiesNumber) {
+            const index = Math.floor(Math.random() * enemiesCells.length);
+            const [i, j] = enemiesCells[index]
+            if (!stuckPosition(grid, i, j)) nums.add(index);
+        }
+        return Array.from(nums);
 }
 
-function isStuck(enemy) {
-    return (enemy.axis == 'hor') ? (!enemy.passability.right && !enemy.passability.left) :
-        (!enemy.passability.top && !enemy.passability.bottom)
+function fixAxis(enemy) {
+    if (enemy.axis == 'hor') {
+        if (!enemy.passability.right && !enemy.passability.left) {
+            enemy.axis = 'ver'
+        }
+    } else {
+        if (!enemy.passability.top && !enemy.passability.bottom) {
+            enemy.axis = 'hor'
+        }   
+    }
 }
 
 function addEnimies(grid) {
-    const indexes = getRandomIndexes()
-    // console.log(enemiesCells);
-    
-    // console.log(indexes);
-    
+    const indexes = getRandomIndexes(grid);
+
     indexes.forEach((el) => {
         const [i, j] = enemiesCells[el];
-        // console.log(i, j);
-        const $enemy = new Enemy();
-        // console.log(document.getElementById(`cell${i}#${j}`));
-        $enemy.create(i, j, grid);
-        if (isStuck($enemy)) stuckEnemies.push($enemy);
-        enemies.push($enemy)
-        // enemiesIndexes.push([i, j])
+        const enemy = new Enemy();
+        enemy.create(i, j, grid);
+        fixAxis(enemy);
+        enemies.push(enemy);
     })
 }
 
 function mapGrid() {
     const grid = [];
+    softs = [];
     for (let i = 0; i < mapHeight; i++) {
         grid[i] = [];
         for (let j = 0; j < mapWidth; j++) {
 
-            if (i == 0 && j == 0 || i == mapHeight-1 && j == 0 || j == mapWidth-1 && i == 0 || j == mapWidth-1 && i == mapHeight-1) {
+            if (i == 0 && j == 0 || i == mapHeight - 1 && j == 0 || j == mapWidth - 1 && i == 0 || j == mapWidth - 1 && i == mapHeight - 1) {
                 // corners cells
                 grid[i][j] = specialSolid;
             } else if (i == 0 || i == mapHeight - 1 || j == 0 || j == mapWidth - 1) {
@@ -81,19 +89,14 @@ function mapGrid() {
     // random gate cell
     gateCell = softs[Math.floor(Math.random() * softs.length)];
     console.log(gateCell);
-    
+
     return grid;
 }
 
 export function mapVisual() {
     const grid = mapGrid();
-    // console.log(grid);
-    
-    // player properties
-    console.log(gameState.cellSize);
-    
     gameState.player.setPlayerProperties(gameState.cellSize);
-    
+
     enemiesCells = [];
     grid.forEach((row, i) => {
         row.forEach((el, j) => {
@@ -101,16 +104,16 @@ export function mapVisual() {
             cell.classList.add('cell');
             if (el == specialSolid) {
                 cell.classList.add('spSolid');
-                cell.style.backgroundPosition = `${-2*gameState.cellSize}px ${-(gameState.stage*gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-2 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
             } else if (el == solid) {
                 cell.classList.add('solid');
-                cell.style.backgroundPosition = `0px ${-(gameState.stage*gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `0px ${-(gameState.stage * gameState.cellSize)}px`;
             } else if (el == soft) {
                 cell.classList.add('soft');
-                cell.style.backgroundPosition = `${-3*gameState.cellSize}px ${-(gameState.stage*gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-3 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
             } else {
                 cell.classList.add('empty');
-                cell.style.backgroundPosition = `${-1*gameState.cellSize}px ${-(gameState.stage*gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-1 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
                 if (i >= 2 && j > 1 && (i + 1) % 2 == 0 && (j + 1) % 2 == 0) {
                     enemiesCells.push([i, j])
                 }
@@ -122,16 +125,10 @@ export function mapVisual() {
     });
 
     addEnimies(grid);
-    // enemiesCells.forEach(([i, j]) => {
-    //     console.log(grid[i][j])
-        
-    // })
-    
     gameState.player.updateBounds(grid, gameState.cellSize);
 
     return grid;
 }
-
 
 export function setTimer(sec, minu, timeElement) {
     const Sec = sec % 60;

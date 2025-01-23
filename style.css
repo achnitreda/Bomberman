@@ -9,6 +9,7 @@ body {
   height: 100vh;
   align-items: center;
   justify-content: center;
+  background-color: #d4d1da;
 }
 
 .gameState {
@@ -41,6 +42,7 @@ body {
   display: grid;
   grid-template-rows: repeat(13, var(--cellSize));
   grid-template-columns: repeat(15, var(--cellSize));
+  border: solid 2px rgb(80, 77, 77);
 }
 
 #player {
