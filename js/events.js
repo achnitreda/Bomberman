@@ -84,3 +84,18 @@ export function setEvents() {
 }
 
 
+function showLevelMessage() {
+    const levelMessage = document.getElementById('level-message');
+    levelMessage.classList.remove('hidden');
+    setTimeout(() => {
+        levelMessage.classList.add('hidden');
+    }, 10000);
+}
+
+setTimeout(() => {
+    showLevelMessage();
+}, 500);
+
+document.getElementById('close-message').addEventListener('click', () => {
+    document.getElementById('level-message').classList.add('hidden');
+});

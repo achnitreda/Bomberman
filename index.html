@@ -31,15 +31,15 @@
     <div id="win-screen" class="win-screen hidden">
       <div class="win-popup">
         <h2>You Win!</h2>
-        <p>Congratulations! You've defeated all enemies and escaped!</p>
+        <p>Congratulations, hero! You've successfully shut down the hostile AI and saved humanity! The world is safe thanks to your bravery and skill </p>
         <button onclick="location.reload()">Play Again</button>
       </div>
     </div>
     <div id="level-win" class="level-win hidden">
       <div class="win-popup">
-        <h2>u are in the way</h2>
-        <p>story to comme here</p>
-        <button>Continue -></button>
+        <h2>You Are On The Ri WAY!</h2>
+        <p>Level cleared! The path ahead is now open. Let's go to continue your mission.</p>
+        <button>Continue →</button>
       </div>
     </div>
     <div id="lose-screen" class="lose-screen lose-hidden">
@@ -56,6 +56,15 @@
         <button id="restart-btn">Restart</button>
       </div>
     </div>
+    <div id="level-message" class="level-message hidden">
+      <div class="message-content">
+        <img src="https://icons.iconarchive.com/icons/yellowicon/game-stars/128/Bomberman-icon.png" width="128" height="128" alt="Bomberman Icon">
+        <div class="message-text">
+          <p>In a world overrun by dangerous machines, you are humanity's last hope. As a skilled demolitions expert armed with specialized bombs, you must defeat these mechanical menaces to reach the final stage. Use the [←] [↑] [↓] [→] keys to move, [Z] to place bombs, and [ESC] to pause. Your mission is simple: eliminate all enemies, find the exit door, avoid enemy contact and your own explosions. Only by reaching the last level and entering the final door will you achieve victory. Remember, strategic bomb placement is key to survival - the fate of our world rests in your hands!</p>
+        </div>
+        <button id="close-message" class="close-button">×</button>
+      </div>
+    </div>    
     <script type="module" src="./js/main.js"></script>
   </body>
 </html>
