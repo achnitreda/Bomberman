@@ -7,31 +7,15 @@ export class Enemy {
     constructor() {
         this.element = null;
         this.speed = 0;
-        this.cell = { i: 0, j: 0 };
+        this.size = 0;
+        this.pxTocenter = 0;
         this.initCell = { i: 0, j: 0 };
         this.switchCell = { i: 0, j: 0 }
-        this.size = 0;
         this.position = { x: 0, y: 0 };
         this.positionInCell = { x: 0, y: 0 };
         this.axis = null;
-        this.moveEntries = {
-            hor: ['x', 'left', 'right'],
-            ver: ['y', 'top', 'bottom'],
-            direction: 1
-        };
+        this.direction = 1;
 
-        this.bounds = {
-            right: 0,
-            left: 0,
-            top: 0,
-            bottom: 0
-        }
-        this.passability = {
-            right: false,
-            left: false,
-            top: false,
-            bottom: false
-        }
         this.sprite = {
             frameCount: 5,
             currentFrame: 0,
@@ -40,189 +24,145 @@ export class Enemy {
         }
     }
 
-    setEnemyProperties(cellSize) {
-        this.speed = cellSize / 40;
-        this.size = Math.floor(cellSize * 0.8);
-        const pxToCenter = Math.floor((cellSize - this.size) / 2);
-
-        this.position.x = cellSize * this.initCell.j + pxToCenter;
-        this.position.y = cellSize * this.initCell.i + pxToCenter;
-
-        this.positionInCell.x = pxToCenter;
-        this.positionInCell.y = pxToCenter;
-
-        if (this.element) {
-            this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
-        }
+    setEnemyProperties() {
+        this.speed = gameState.cellSize / 40;
+        this.size = Math.trunc(gameState.cellSize * 0.8);
+        this.pxTocenter = Math.trunc((gameState.cellSize - this.size) * 0.5) + 1;
+        this.position.x = (gameState.cellSize * this.initCell.j) + this.pxTocenter;
+        this.position.y = (gameState.cellSize * this.initCell.i) + this.pxTocenter;
+        this.positionInCell.x = this.pxTocenter;
+        this.positionInCell.y = this.pxTocenter;
+        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
     }
 
-
-    updateBounds(grid) {
-        const cellSize = gameState.cellSize
-
-        const posX = ((this.position.x + (this.size * 0.55)) / cellSize);
-        const posY = ((this.position.y + (this.size * 0.55)) / cellSize);
-
-        this.bounds.left = Math.floor(posX) * cellSize;
-        this.bounds.top = Math.floor(posY) * cellSize;
-        this.bounds.right = Math.ceil(posX) * cellSize;
-        this.bounds.bottom = Math.ceil(posY) * cellSize;
-
-        this.updatPassability(grid)
-    }
-
-    updatPassability(grid) {
-        const cellSize = gameState.cellSize
-        const i = Math.floor((this.position.y + (this.size * 0.55)) / cellSize);
-        const j = Math.floor((this.position.x + (this.size * 0.55)) / cellSize);
-
-        this.passability.right = grid[i][j + 1] == 0;
-        this.passability.left = grid[i][j - 1] == 0;
-        this.passability.bottom = grid[i + 1][j] == 0;
-        this.passability.top = grid[i - 1][j] == 0;
-
-        this.cell.i = i;
-        this.cell.j = j;
-    }
-
-    create(i, j, grid) {
-        const cellSize = gameState.cellSize
+    create(i, j) {
         const enimieCell = document.getElementById(`cell${i}#${j}`);
-
         this.element = document.createElement('div');
         this.element.classList.add('enemy');
-
-        this.cell.i = i;
-        this.cell.j = j;
         this.initCell.i = i;
         this.initCell.j = j;
-
-        this.setEnemyProperties(cellSize);
-
         this.axis = (Math.random() > 0.5 ? 'hor' : 'ver');
-        this.updateBounds(grid);
+        this.setEnemyProperties();
         enimieCell.appendChild(this.element);
     }
 
-    switchAxis(grid, cellSize) {
-        const pxTocenter = Math.floor((cellSize - this.size) / 2);
+    switchAxis(grid) {
+        const i = Math.trunc((this.position.y + (this.size * 0.5)) / gameState.cellSize);
+        const j = Math.trunc((this.position.x + (this.size * 0.5)) / gameState.cellSize);
 
         if (this.axis == 'hor') {
-            if (this.moveEntries.direction == 1) {
-                if (grid[this.cell.i + 1][this.cell.j] == 0 || grid[this.cell.i - 1][this.cell.j] == 0) {
-                    if (this.position.x >= (this.cell.j * cellSize) + pxTocenter && this.cell.j != this.switchCell.j) {
-                        if (Math.random() > 0.5) this.axis = 'ver';
-                        this.switchCell.i = this.cell.i;
-                        this.switchCell.j = this.cell.j;
-                    }
+            if (this.direction == 1 && (grid[i + 1][j] == 0 || grid[i - 1][j] == 0)) {
+                if ((this.position.x >= j * gameState.cellSize + this.pxTocenter && j != this.switchCell.j)) {
+                    if (Math.random() > 0.5) this.axis = 'ver';
+                    if (Math.random() > 0.5) this.direction = -1;
+                    
+                    this.switchCell.i = i;
+                    this.switchCell.j = j;
                 }
-
-            } else {
-                if (grid[this.cell.i - 1][this.cell.j] == 0 || grid[this.cell.i + 1][this.cell.j] == 0) {
-                    if (this.position.x <= (this.cell.j * cellSize) + pxTocenter + 2 && this.cell.j != this.switchCell.j) {
-                        if (Math.random() > 0.35) this.axis = 'ver';
-                        this.switchCell.i = this.cell.i;
-                        this.switchCell.j = this.cell.j;
-                    }
+            } else if (this.direction == -1 && (grid[i + 1][j] == 0 || grid[i - 1][j] == 0)) {
+                if (this.position.x <= j * gameState.cellSize + this.pxTocenter && j != this.switchCell.j) {
+                    if (Math.random() > 0.5) this.axis = 'ver';
+                    if (Math.random() > 0.5) this.direction = 1;
+                    this.switchCell.i = i;
+                    this.switchCell.j = j;
                 }
             }
         } else {
-            if (this.moveEntries.direction == 1) {
-                if (grid[this.cell.i][this.cell.j + 1] == 0 || grid[this.cell.i][this.cell.j - 1] == 0) {
-                    if (this.position.y >= (this.cell.i * cellSize) + pxTocenter && this.cell.i != this.switchCell.i) {
-                        if (Math.random() > 0.35) this.axis = 'hor';
-                        this.switchCell.i = this.cell.i;
-                        this.switchCell.j = this.cell.j;
-                    }
+            if (this.direction == 1 && (grid[i][j+1] == 0 || grid[i][j-1] == 0)) {
+                if ((this.position.y >= i * gameState.cellSize + this.pxTocenter && i != this.switchCell.i)) {
+                    if (Math.random() > 0.5) this.axis = 'hor';
+                    if (Math.random() > 0.5) this.direction = -1;
+                    this.switchCell.i = i;
+                    this.switchCell.j = j;
                 }
-
-            } else {
-                if (grid[this.cell.i][this.cell.j - 1] == 0) {
-                    if (this.position.y <= (this.cell.i * cellSize) + pxTocenter + 2 && this.cell.i != this.switchCell.i) {
-                        if (Math.random() > 0.35) this.axis = 'hor';
-                        this.switchCell.i = this.cell.i;
-                        this.switchCell.j = this.cell.j;
-                    }
+            } else if (this.direction == -1 && (grid[i][j+1] == 0 || grid[i][j-1] == 0)) {
+                if (this.position.y <= i * gameState.cellSize + this.pxTocenter && i != this.switchCell.i) {
+                    if (Math.random() > 0.5) this.axis = 'hor';
+                    if (Math.random() > 0.5) this.direction = 1;
+                    this.switchCell.i = i;
+                    this.switchCell.j = j;
                 }
             }
         }
+
     }
 
     move(grid) {
-        const cellSize = gameState.cellSize;
-
-        if (this.moveEntries.direction == 1) {
-            if (this.position[this.moveEntries[this.axis][0]] + this.size + this.speed <= this.bounds[this.moveEntries[this.axis][2]]) {
-                this.position[this.moveEntries[this.axis][0]] += this.speed;
-                this.positionInCell[this.moveEntries[this.axis][0]] += this.speed;
-            } else {
-                if (this.passability[this.moveEntries[this.axis][2]]) {
-                    this.position[this.moveEntries[this.axis][0]] += this.speed;
-                    this.positionInCell[this.moveEntries[this.axis][0]] += this.speed;
-                    if (this.axis == 'hor') {
-                        if (bomb.cell && (this.cell.j + 1 == bomb.cell.j && this.cell.i == bomb.cell.i)) {
-                            this.moveEntries.direction = -1;
-                            this.switchCell.i = this.cell.i;
-                            this.switchCell.j = this.cell.j;
-                        }
-                    } else {
-                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i + 1 == bomb.cell.i)) {
-                            this.moveEntries.direction = -1;
-                            this.switchCell.i = this.cell.i;
-                            this.switchCell.j = this.cell.j;
-                        }
-                    }
-                } else {
-                    this.moveEntries.direction = -1;
-                    this.switchCell.i = this.cell.i;
-                    this.switchCell.j = this.cell.j;
-                }
-            }
-
-            if (this.position[this.moveEntries[this.axis][0]] + (this.size * 0.55) > this.bounds[this.moveEntries[this.axis][2]]) {
-                this.updateBounds(grid);
-            }
+        if (this.axis == 'hor') {
+            if (this.direction == 1) this.moveRight(grid);
+            else this.moveLeft(grid);
         } else {
-            if (this.position[this.moveEntries[this.axis][0]] - this.speed >= this.bounds[this.moveEntries[this.axis][1]]) {
-                this.position[this.moveEntries[this.axis][0]] -= this.speed;
-                this.positionInCell[this.moveEntries[this.axis][0]] -= this.speed;
-
-            } else {
-                if (this.passability[this.moveEntries[this.axis][1]]) {
-                    this.position[this.moveEntries[this.axis][0]] -= this.speed;
-                    this.positionInCell[this.moveEntries[this.axis][0]] -= this.speed;
-                    if (this.axis == 'hor') {
-                        if (bomb.cell && (this.cell.j - 1 == bomb.cell.j && this.cell.i == bomb.cell.i)) {
-                            this.moveEntries.direction = 1;
-                            this.switchCell.i = this.cell.i;
-                            this.switchCell.j = this.cell.j;
-                        }
-                    } else {
-                        if (bomb.cell && (this.cell.j == bomb.cell.j && this.cell.i - 1 == bomb.cell.i)) {
-                            this.moveEntries.direction = 1;
-                            this.switchCell.i = this.cell.i;
-                            this.switchCell.j = this.cell.j;
-                        }
-                    }
-                } else {
-                    this.moveEntries.direction = 1;
-                    this.switchCell.i = this.cell.i;
-                    this.switchCell.j = this.cell.j;
-                }
-            }
-
-            if (this.position[this.moveEntries[this.axis][0]] + (this.size * 0.55) < this.bounds[this.moveEntries[this.axis][1]]) {
-                this.updateBounds(grid);
-
-            }
+            if (this.direction == 1) this.moveDown(grid);
+            else this.moveUp(grid);
         }
 
-        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`
+        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
+        this.switchAxis(grid);
+
         if (this.collisionWithplayer()) {
-            player.death(cellSize);
+            player.death(gameState.cellSize);
         }
 
-        this.switchAxis(grid, cellSize);
+    }
+
+    moveRight(grid) {
+        const i = Math.trunc((this.position.y) / gameState.cellSize);
+        const j = Math.trunc((this.position.x + this.size) / gameState.cellSize);
+        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+        
+        if (grid[i][j] == 0 && !bombCell) {
+            this.position.x += this.speed;
+            this.positionInCell.x += this.speed;
+        } else {
+            this.direction = -1;
+            this.switchCell.i = i;
+            this.switchCell.j = j-1;
+        }
+    }
+
+    moveLeft(grid) {
+        const i = Math.trunc((this.position.y) / gameState.cellSize);
+        const j = Math.trunc((this.position.x) / gameState.cellSize);
+        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+
+        if (grid[i][j] == 0 && !bombCell) {
+            this.position.x -= this.speed;
+            this.positionInCell.x -= this.speed;
+        } else {
+            this.direction = 1;
+            this.switchCell.i = i;
+            this.switchCell.j = j+1;
+        }
+    }
+
+    moveUp(grid) {
+        const i = Math.trunc((this.position.y) / gameState.cellSize);
+        const j = Math.trunc((this.position.x) / gameState.cellSize);
+        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+
+        if (grid[i][j] == 0 && !bombCell) {
+            this.position.y -= this.speed;
+            this.positionInCell.y -= this.speed;
+        } else {
+            this.direction = 1;
+            this.switchCell.i = i+1;
+            this.switchCell.j = j;
+        }
+    }
+
+    moveDown(grid) {
+        const i = Math.trunc((this.position.y + this.size) / gameState.cellSize);
+        const j = Math.trunc((this.position.x) / gameState.cellSize);
+        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+
+        if (grid[i][j] == 0 && !bombCell) {
+            this.position.y += this.speed;
+            this.positionInCell.y += this.speed;
+        } else {
+            this.direction = -1;
+            this.switchCell.i = i-1;
+            this.switchCell.j = j;
+        }
     }
 
     animate(currentTime) {
@@ -230,13 +170,12 @@ export class Enemy {
         if (currentTime - this.sprite.lastUpdate > this.sprite.animationSpeed) {
             this.sprite.currentFrame = (this.sprite.currentFrame + 1) % this.sprite.frameCount;
             this.sprite.lastUpdate = currentTime;
-
-            const x = this.sprite.currentFrame * (cellSize * 0.8);
-            this.element.style.backgroundPosition = `-${x}px 0px`;
+            this.element.style.backgroundPosition = `-${this.sprite.currentFrame * (cellSize * 0.8)}px 0px`;
         }
     }
 
     collisionWithplayer() {
-        return player.currentCell.i == this.cell.i && player.currentCell.j == this.cell.j;
+        return Math.trunc((player.position.y + (player.size * 0.5))/gameState.cellSize) == Math.trunc((this.position.y + (this.size * 0.5))/gameState.cellSize) &&
+        Math.trunc((player.position.x + (player.size * 0.5))/gameState.cellSize) == Math.trunc((this.position.x + (this.size * 0.5))/gameState.cellSize);
     }
 }

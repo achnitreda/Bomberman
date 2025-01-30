@@ -49,6 +49,7 @@ body {
   position: absolute;
   width: calc(var(--cellSize) * 0.8);
   height: calc(var(--cellSize) * 0.8);
+  /* background-color: aqua; */
   background-image: url("./bomberman.png");
   z-index: 10;
 }
@@ -59,22 +60,6 @@ body {
   height: var(--cellSize);
   background-image: url("./mapTileSet_v1.png");
   background-size: calc(var(--cellSize) * 4) calc(var(--cellSize) * 3);
-}
-
-.solid {
-  background-position: 0px calc(var(--stage) * var(--cellSize) * -1);
-}
-
-.empty {
-  background-position: calc(var(--cellSize) * -1) calc(var(--stage) * var(--cellSize) * -1);
-}
-
-.spSolid {
-  background-position: calc(var(--cellSize) * -2) calc(var(--stage) * var(--cellSize) * -1);
-}
-
-.soft {
-  background-position: calc(var(--cellSize) * -3) calc(var(--stage) * var(--cellSize) * -1);
 }
 
 .bomb {

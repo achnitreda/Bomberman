@@ -32,13 +32,13 @@ function getRandomIndexes(grid) {
         return Array.from(nums);
 }
 
-function fixAxis(enemy) {
+function fixAxis(enemy, grid) {
     if (enemy.axis == 'hor') {
-        if (!enemy.passability.right && !enemy.passability.left) {
+        if (grid[enemy.initCell.i][enemy.initCell.j+1] != 0 && grid[enemy.initCell.i][enemy.initCell.j-1] != 0) {
             enemy.axis = 'ver'
         }
     } else {
-        if (!enemy.passability.top && !enemy.passability.bottom) {
+        if (grid[enemy.initCell.i+1][enemy.initCell.j] != 0 && grid[enemy.initCell.i-1][enemy.initCell.j] != 0) {
             enemy.axis = 'hor'
         }   
     }
@@ -46,12 +46,11 @@ function fixAxis(enemy) {
 
 function addEnimies(grid) {
     const indexes = getRandomIndexes(grid);
-
     indexes.forEach((el) => {
         const [i, j] = enemiesCells[el];
         const enemy = new Enemy();
         enemy.create(i, j, grid);
-        fixAxis(enemy);
+        fixAxis(enemy, grid);
         enemies.push(enemy);
     })
 }
@@ -88,14 +87,13 @@ function mapGrid() {
 
     // random gate cell
     gateCell = softs[Math.floor(Math.random() * softs.length)];
-    console.log(gateCell);
 
     return grid;
 }
 
 export function mapVisual() {
     const grid = mapGrid();
-    gameState.player.setPlayerProperties(gameState.cellSize);
+    gameState.player.setPlayerProperties(gameState.cellSize, 1, 1);
 
     enemiesCells = [];
     grid.forEach((row, i) => {
@@ -104,16 +102,16 @@ export function mapVisual() {
             cell.classList.add('cell');
             if (el == specialSolid) {
                 cell.classList.add('spSolid');
-                cell.style.backgroundPosition = `${-2 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-2 * gameState.cellSize}px ${-(gameState.level * gameState.cellSize)}px`;
             } else if (el == solid) {
                 cell.classList.add('solid');
-                cell.style.backgroundPosition = `0px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `0px ${-(gameState.level * gameState.cellSize)}px`;
             } else if (el == soft) {
                 cell.classList.add('soft');
-                cell.style.backgroundPosition = `${-3 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-3 * gameState.cellSize}px ${-(gameState.level * gameState.cellSize)}px`;
             } else {
                 cell.classList.add('empty');
-                cell.style.backgroundPosition = `${-1 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-1 * gameState.cellSize}px ${-(gameState.level * gameState.cellSize)}px`;
                 if (i >= 2 && j > 1 && (i + 1) % 2 == 0 && (j + 1) % 2 == 0) {
                     enemiesCells.push([i, j])
                 }
@@ -125,7 +123,6 @@ export function mapVisual() {
     });
 
     addEnimies(grid);
-    gameState.player.updateBounds(grid, gameState.cellSize);
 
     return grid;
 }

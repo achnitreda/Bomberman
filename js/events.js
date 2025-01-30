@@ -1,7 +1,7 @@
 import { gameState, gameLoop } from "./main.js";
 import { handleResize } from "./responsive.js";
 import { bomb } from "./bomb.js";
-import { startNewStage } from "./gameProgress.js";
+import { startNewLevel } from "./gameProgress.js";
 
 const pauseMenu = document.getElementById('pause-menu');
 const continueBtn = document.getElementById('continue-btn');
@@ -45,7 +45,7 @@ export function setEvents() {
 
     // place bomb
     document.addEventListener("keypress", e => {
-        if (gameState.gameWon || gameState.gameLost) {
+        if (gameState.gameWon || gameState.gameLost || gameState.storyTime) {
             return;
         }
     
@@ -56,7 +56,7 @@ export function setEvents() {
 
     // player movement control 
     document.addEventListener("keydown", (e) => {
-        if (gameState.gameWon || gameState.gameLost) {
+        if (gameState.gameWon || gameState.gameLost || gameState.storyTime) {
             return;
         }
     
@@ -68,7 +68,7 @@ export function setEvents() {
     })
 
     document.addEventListener("keyup", (e) => {
-        if (gameState.gameWon || gameState.gameLost) {
+        if (gameState.gameWon || gameState.gameLost || gameState.storyTime) {
             return;
         }
     
@@ -78,7 +78,7 @@ export function setEvents() {
     })
 
     document.querySelector('#level-win button').addEventListener('click', () => {
-        startNewStage();
+        startNewLevel();
         document.querySelector('.level-win').classList.add('hidden');
     })
 }

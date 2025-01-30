@@ -18,11 +18,11 @@ function showLoseScreen() {
     loseScreen.classList.remove('lose-hidden');
 }
 
-function startNewStage() {
+function startNewLevel() {
     gameState.storyTime = false;
     const map = document.getElementById('map');
     map.innerHTML = '';
-    gameState.stage++;
+    gameState.level++;
     gameState.enimiesNumber += 2;
     player.lifes++;
     player.element.style.backgroundPosition = `0px 0px`;
@@ -57,4 +57,4 @@ function checkLoseCondition(gameState) {
     }
 }
 
-export { checkLoseCondition, checkWinCondition, checkLevelWinCondition, startNewStage }
+export { checkLoseCondition, checkWinCondition, checkLevelWinCondition, startNewLevel }
