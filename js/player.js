@@ -8,6 +8,8 @@ const player = {
     size: 0,
     speed: 0,
     lifes: 3,
+    deathTime: null,
+    reviveTime: null,
 
     position: {
         x: 0,
@@ -28,7 +30,7 @@ const player = {
         animationSpeed: 80,
     },
 
-    setPlayerProperties: function (cellsize, i, j) {
+    setProperties: function (cellsize, i, j) {
         this.speed = cellsize / 20;
         this.size = Math.trunc(cellsize * 0.8);
         this.position.x = (j * cellsize) + Math.trunc((cellsize - this.size) * 0.5);
@@ -50,8 +52,8 @@ const player = {
     },
 
     move: function (direction, grid) {
-        const centerY = (Math.floor((this.position.y + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
-        const centerX = (Math.floor((this.position.x + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
+        const centerY = (Math.trunc((this.position.y + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
+        const centerX = (Math.trunc((this.position.x + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
 
         switch (direction) {
             case "Right": this.moveRight(centerY, grid); break;
@@ -63,11 +65,10 @@ const player = {
     },
 
     moveRight: function (centerY, grid) {
-        const verticalOffset = Math.abs(centerY - this.position.y);
-        const i = Math.floor((this.position.y) / gameState.cellSize);
-        const j = Math.floor((this.position.x + this.size) / gameState.cellSize);
+        const i = Math.trunc((this.position.y) / gameState.cellSize);
+        const j = Math.trunc((this.position.x + this.size) / gameState.cellSize);
         
-        if (verticalOffset > this.speed) {
+        if (Math.abs(centerY - this.position.y) > this.speed) {
             this.position.y += centerY > this.position.y ? this.speed : -this.speed;
         } else if (grid[i][j] == 0) {
             this.position.x += this.speed;
@@ -75,11 +76,10 @@ const player = {
     },
 
     moveLeft: function (centerY, grid) {
-        const verticalOffset = Math.abs(centerY - this.position.y);
-        const i = Math.floor((this.position.y) / gameState.cellSize);
-        const j = Math.floor((this.position.x) / gameState.cellSize);
+        const i = Math.trunc((this.position.y) / gameState.cellSize);
+        const j = Math.trunc((this.position.x) / gameState.cellSize);
 
-        if (verticalOffset > this.speed) {
+        if (Math.abs(centerY - this.position.y) > this.speed) {
             this.position.y += centerY > this.position.y ? this.speed : -this.speed;
         } else if (grid[i][j] == 0) {
             this.position.x -= this.speed;
@@ -87,11 +87,10 @@ const player = {
     },
 
     moveDown: function (centerX, grid) {
-        const horizontalOffset = Math.abs(centerX - this.position.x);
-        const i = Math.floor((this.position.y + this.size) / gameState.cellSize);
-        const j = Math.floor((this.position.x) / gameState.cellSize);
+        const i = Math.trunc((this.position.y + this.size) / gameState.cellSize);
+        const j = Math.trunc((this.position.x) / gameState.cellSize);
         
-        if (horizontalOffset > this.speed) {
+        if (Math.abs(centerX - this.position.x) > this.speed) {
             this.position.x += centerX > this.position.x ? this.speed : -this.speed;
         } else if (grid[i][j] == 0) {
             this.position.y += this.speed;
@@ -99,11 +98,10 @@ const player = {
     },
 
     moveUp: function (centerX, grid) {
-        const horizontalOffset = Math.abs(centerX - this.position.x);
-        const i = Math.floor((this.position.y) / gameState.cellSize);
-        const j = Math.floor((this.position.x) / gameState.cellSize);
+        const i = Math.trunc((this.position.y) / gameState.cellSize);
+        const j = Math.trunc((this.position.x) / gameState.cellSize);
         
-        if (horizontalOffset > this.speed) {
+        if (Math.abs(centerX - this.position.x) > this.speed) {
             this.position.x += centerX > this.position.x ? this.speed : -this.speed;
         } else if (grid[i][j] == 0) {
             this.position.y -= this.speed;
@@ -125,7 +123,7 @@ const player = {
         }
     },
 
-    death: function (cellSize) {
+    death: function (cellSize, time) {
         if (!this.alive && !this.revive) return;
 
         this.lifes--;
@@ -135,19 +133,7 @@ const player = {
         this.position.x = cellSize + Math.floor((cellSize - this.size) * 0.5);
         this.position.y = cellSize + Math.floor((cellSize - this.size) * 0.5);
         setNbOfHearts(this.lifes);
-        
-        // add logic to work with RAF time rather than settimeout
-        setTimeout(() => {
-            this.revive = true;
-            this.alive = true;
-            this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
-
-            setTimeout(() => {
-                this.element.classList.add('opacity1');
-                this.revive = false;
-            }, 2000)
-
-        }, 2000)
+        this.deathTime = time;
     }
 }
 

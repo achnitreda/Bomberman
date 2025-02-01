@@ -10,8 +10,15 @@ const soft = 1;
 const solid = 2;
 const specialSolid = 3;
 let softs = [];
-export const enemies = [];
-export const stuckEnemies = [];
+const logo = {
+    element: document.getElementById('logo'),
+    dir: 1,
+}
+
+export function logoMove() {
+    logo.element.style.transform = `translate(${logo.dir*.1}px, 0px)`;
+    logo.dir *= -1;
+}
 
 function randomNumber() {
     return (Math.random() < 0.6) ? empty : soft
@@ -35,11 +42,11 @@ function getRandomIndexes(grid) {
 function fixAxis(enemy, grid) {
     if (enemy.axis == 'hor') {
         if (grid[enemy.initCell.i][enemy.initCell.j+1] != 0 && grid[enemy.initCell.i][enemy.initCell.j-1] != 0) {
-            enemy.axis = 'ver'
+            enemy.axis = 'ver';
         }
     } else {
         if (grid[enemy.initCell.i+1][enemy.initCell.j] != 0 && grid[enemy.initCell.i-1][enemy.initCell.j] != 0) {
-            enemy.axis = 'hor'
+            enemy.axis = 'hor';
         }   
     }
 }
@@ -50,8 +57,10 @@ function addEnimies(grid) {
         const [i, j] = enemiesCells[el];
         const enemy = new Enemy();
         enemy.create(i, j, grid);
+        console.log(i, j, enemy.axis);
+        
         fixAxis(enemy, grid);
-        enemies.push(enemy);
+        gameState.enemies.push(enemy);
     })
 }
 
@@ -93,7 +102,7 @@ function mapGrid() {
 
 export function mapVisual() {
     const grid = mapGrid();
-    gameState.player.setPlayerProperties(gameState.cellSize, 1, 1);
+    gameState.player.setProperties(gameState.cellSize, 1, 1);
 
     enemiesCells = [];
     grid.forEach((row, i) => {

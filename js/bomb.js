@@ -1,11 +1,11 @@
 import { player } from "./player.js"
-import { gateCell, enemies, setScore } from "./map.js";
+import { gateCell, setScore } from "./map.js";
 import { gameState } from "./main.js";
 
 export const bomb = {
     element: null,
     exist: false,
-    cell: null,
+    cell: {i: 0, j: 0},
     createTime: null,
     explode: false,
     timerId: null,
@@ -29,11 +29,8 @@ export const bomb = {
     updateSize: function (cellSize) {
         this.sprite.frameSize = cellSize * 0.8;
         if (this.element) {
-            const pxToCenter = Math.floor((cellSize - this.sprite.frameSize) / 2);
-            this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
-
-            const x = this.sprite.currentFrame * this.sprite.frameSize;
-            this.element.style.backgroundPosition = `-${x}px 0px`;
+            this.element.style.transform = `translate(${Math.trunc((cellSize - this.sprite.frameSize) / 2)}px, ${Math.trunc((cellSize - this.sprite.frameSize) / 2)}px)`;
+            this.element.style.backgroundPosition = `-${this.sprite.currentFrame * this.sprite.frameSize}px 0px`;
         }
     },
 
@@ -55,10 +52,8 @@ export const bomb = {
 
     create: function (time) {
         this.sprite.frameSize = gameState.cellSize * 0.8;
-        this.cell = {
-            i: Math.trunc((player.position.y + (player.size * 0.5)) / gameState.cellSize),
-            j: Math.trunc((player.position.x + (player.size * 0.5)) / gameState.cellSize)
-        }
+        this.cell.i = Math.trunc((player.position.y + (player.size * 0.5)) / gameState.cellSize);
+        this.cell.j = Math.trunc((player.position.x + (player.size * 0.5)) / gameState.cellSize);
         this.setCellsAffected();
         const bombCell = document.getElementById(`cell${this.cell.i}#${this.cell.j}`);
         this.element = document.createElement("div");
@@ -75,7 +70,7 @@ export const bomb = {
         cell.appendChild(explosion);
     },
 
-    explosion: function (grid, cellSize) {
+    explosion: function (grid, cellSize, time) {
         for (let cell in this.cellsAffected) {
             const [i, j] = this.cellsAffected[cell];
             if (grid[i][j] == 1 || grid[i][j] == 0) {
@@ -94,13 +89,13 @@ export const bomb = {
             
             //player
             if (Math.trunc((player.position.y + (player.size * 0.5)) / cellSize) == i && Math.trunc((player.position.x + (player.size * 0.5)) / cellSize) == j) {
-                player.death(cellSize);
+                player.death(cellSize, time);
             }
 
             // enimies 
-            enemies.forEach((enemy, index) => {
+            gameState.enemies.forEach((enemy, index) => {
                 if (Math.trunc((enemy.position.y + (enemy.size * 0.5))/cellSize) == i && Math.trunc((enemy.position.x + (enemy.size * 0.5))/cellSize) == j) {
-                    enemies.splice(index, 1);
+                    gameState.enemies.splice(index, 1);
                     enemy.element.remove();
                     gameState.score += 15;
                     setScore(gameState.score);
@@ -109,7 +104,6 @@ export const bomb = {
 
         }
         this.element.remove();
-        this.createTime = null;
-        this.cell = null;
+        this.createTime = 0;
     },
 }

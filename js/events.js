@@ -1,7 +1,8 @@
-import { gameState, gameLoop } from "./main.js";
+import { gameState} from "./main.js";
 import { handleResize } from "./responsive.js";
 import { bomb } from "./bomb.js";
 import { startNewLevel } from "./gameProgress.js";
+import { mapVisual, setNbOfHearts } from "./map.js";
 
 const pauseMenu = document.getElementById('pause-menu');
 const continueBtn = document.getElementById('continue-btn');
@@ -20,12 +21,11 @@ function togglePause() {
         if (bomb.exist) {
             bomb.timerId = setTimeout(() => bomb.explode = true, 1500)
         }
-        requestAnimationFrame(gameLoop);
     }
 }
 
 function restartGame() {
-    location.reload();
+ location.reload()
 }
 
 export function setEvents() {

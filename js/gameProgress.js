@@ -20,23 +20,22 @@ function showLoseScreen() {
 
 function startNewLevel() {
     gameState.storyTime = false;
-    const map = document.getElementById('map');
-    map.innerHTML = '';
+    gameState.movementKeys = [];
+    gameState.board.innerHTML = '';
     gameState.level++;
     gameState.enimiesNumber += 2;
     player.lifes++;
     player.element.style.backgroundPosition = `0px 0px`;
-    player.currentCell.i = 1;
-    player.currentCell.j = 1;
     gameState.grid = mapVisual();
     setNbOfHearts(player.lifes);
-    requestAnimationFrame(gameLoop);
 }
 
 function checkWinCondition(gameState, enemies, gateCell) {
+    
+    
     if (enemies.length === 0 &&
-        gameState.player.currentCell.i === gateCell[0] &&
-        gameState.player.currentCell.j === gateCell[1]) {
+        Math.trunc((player.position.y + (player.size*0.5))/ gameState.cellSize) === gateCell[0] &&
+        Math.trunc((player.position.x + (player.size*0.5))/ gameState.cellSize) === gateCell[1]) {
         gameState.gameWon = true;
         showWinScreen();
     }
@@ -44,8 +43,8 @@ function checkWinCondition(gameState, enemies, gateCell) {
 
 function checkLevelWinCondition(gameState, enemies, gateCell) {
     if (enemies.length === 0 &&
-        gameState.player.currentCell.i === gateCell[0] &&
-        gameState.player.currentCell.j === gateCell[1]) {
+        Math.trunc((player.position.y + (player.size*0.5))/ gameState.cellSize) === gateCell[0] &&
+        Math.trunc((player.position.x + (player.size*0.5))/ gameState.cellSize) === gateCell[1]) {
         showLevelWinScreen();
     }
 }

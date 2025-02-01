@@ -87,7 +87,7 @@ export class Enemy {
 
     }
 
-    move(grid) {
+    move(grid, time) {
         if (this.axis == 'hor') {
             if (this.direction == 1) this.moveRight(grid);
             else this.moveLeft(grid);
@@ -100,7 +100,7 @@ export class Enemy {
         this.switchAxis(grid);
 
         if (this.collisionWithplayer()) {
-            player.death(gameState.cellSize);
+            player.death(gameState.cellSize, time);
         }
 
     }
@@ -108,7 +108,7 @@ export class Enemy {
     moveRight(grid) {
         const i = Math.trunc((this.position.y) / gameState.cellSize);
         const j = Math.trunc((this.position.x + this.size) / gameState.cellSize);
-        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
         
         if (grid[i][j] == 0 && !bombCell) {
             this.position.x += this.speed;
@@ -123,7 +123,7 @@ export class Enemy {
     moveLeft(grid) {
         const i = Math.trunc((this.position.y) / gameState.cellSize);
         const j = Math.trunc((this.position.x) / gameState.cellSize);
-        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
 
         if (grid[i][j] == 0 && !bombCell) {
             this.position.x -= this.speed;
@@ -138,7 +138,7 @@ export class Enemy {
     moveUp(grid) {
         const i = Math.trunc((this.position.y) / gameState.cellSize);
         const j = Math.trunc((this.position.x) / gameState.cellSize);
-        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
 
         if (grid[i][j] == 0 && !bombCell) {
             this.position.y -= this.speed;
@@ -153,7 +153,7 @@ export class Enemy {
     moveDown(grid) {
         const i = Math.trunc((this.position.y + this.size) / gameState.cellSize);
         const j = Math.trunc((this.position.x) / gameState.cellSize);
-        const bombCell = (bomb.cell) ? bomb.cell.i == i && bomb.cell.j == j: false;
+        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
 
         if (grid[i][j] == 0 && !bombCell) {
             this.position.y += this.speed;
