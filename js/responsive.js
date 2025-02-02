@@ -11,8 +11,8 @@ export function calcCellSize() {
     const availableWidth = windowWidth * 0.8;
     const availableHeight = windowHeight * 0.8;
 
-    const cellByWidth = Math.floor(availableWidth / 15);
-    const cellByHeight = Math.floor(availableHeight / 13);
+    const cellByWidth = Math.trunc(availableWidth / 15);
+    const cellByHeight = Math.trunc(availableHeight / 13);
 
     let cellSize = Math.min(cellByWidth, cellByHeight);
 
@@ -64,7 +64,7 @@ export const handleResize = debounce((gameState) => {
 
     // reset enemies propertise to much the new sizes
     gameState.enemies.forEach((enemy) => {
-        enemy.setEnemyProperties(gameState.cellSize);
+        if (enemy) enemy.setEnemyProperties(gameState.cellSize);
     });
     
     gameState.player.setProperties(gameState.cellSize, i, j);

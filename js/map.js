@@ -32,7 +32,7 @@ function stuckPosition(grid, i, j) {
 function getRandomIndexes(grid) {
         const nums = new Set();
         while (nums.size < gameState.enimiesNumber) {
-            const index = Math.floor(Math.random() * enemiesCells.length);
+            const index = Math.trunc(Math.random() * enemiesCells.length);
             const [i, j] = enemiesCells[index]
             if (!stuckPosition(grid, i, j)) nums.add(index);
         }
@@ -57,8 +57,6 @@ function addEnimies(grid) {
         const [i, j] = enemiesCells[el];
         const enemy = new Enemy();
         enemy.create(i, j, grid);
-        console.log(i, j, enemy.axis);
-        
         fixAxis(enemy, grid);
         gameState.enemies.push(enemy);
     })
@@ -95,8 +93,9 @@ function mapGrid() {
     }
 
     // random gate cell
-    gateCell = softs[Math.floor(Math.random() * softs.length)];
-
+    gateCell = softs[Math.trunc(Math.random() * softs.length)];
+    console.log(gateCell);
+    
     return grid;
 }
 

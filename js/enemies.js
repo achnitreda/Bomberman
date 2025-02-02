@@ -47,40 +47,35 @@ export class Enemy {
     }
 
     switchAxis(grid) {
-        const i = Math.trunc((this.position.y + (this.size * 0.5)) / gameState.cellSize);
-        const j = Math.trunc((this.position.x + (this.size * 0.5)) / gameState.cellSize);
+        this.i = Math.trunc((this.position.y + (this.size * 0.5)) / gameState.cellSize);
+        this.j = Math.trunc((this.position.x + (this.size * 0.5)) / gameState.cellSize);
 
         if (this.axis == 'hor') {
-            if (this.direction == 1 && (grid[i + 1][j] == 0 || grid[i - 1][j] == 0)) {
-                if ((this.position.x >= j * gameState.cellSize + this.pxTocenter && j != this.switchCell.j)) {
-                    if (Math.random() > 0.5) this.axis = 'ver';
-                    if (Math.random() > 0.5) this.direction = -1;
-                    
-                    this.switchCell.i = i;
-                    this.switchCell.j = j;
+            if (this.direction == 1 && (grid[this.i + 1][this.j] == 0 || grid[this.i - 1][this.j] == 0)) {
+                if ((this.position.x >= this.j * gameState.cellSize + this.pxTocenter && this.j != this.switchCell.j)) {
+                    if (Math.random() > 0.4) this.axis = 'ver';
+                    this.switchCell.i = this.i;
+                    this.switchCell.j = this.j;
                 }
-            } else if (this.direction == -1 && (grid[i + 1][j] == 0 || grid[i - 1][j] == 0)) {
-                if (this.position.x <= j * gameState.cellSize + this.pxTocenter && j != this.switchCell.j) {
-                    if (Math.random() > 0.5) this.axis = 'ver';
-                    if (Math.random() > 0.5) this.direction = 1;
-                    this.switchCell.i = i;
-                    this.switchCell.j = j;
+            } else if (this.direction == -1 && (grid[this.i + 1][this.j] == 0 || grid[this.i - 1][this.j] == 0)) {
+                if (this.position.x <= this.j * gameState.cellSize + this.pxTocenter && this.j != this.switchCell.j) {
+                    if (Math.random() > 0.4) this.axis = 'ver';
+                    this.switchCell.i = this.i;
+                    this.switchCell.j = this.j;
                 }
             }
         } else {
-            if (this.direction == 1 && (grid[i][j+1] == 0 || grid[i][j-1] == 0)) {
-                if ((this.position.y >= i * gameState.cellSize + this.pxTocenter && i != this.switchCell.i)) {
-                    if (Math.random() > 0.5) this.axis = 'hor';
-                    if (Math.random() > 0.5) this.direction = -1;
-                    this.switchCell.i = i;
-                    this.switchCell.j = j;
+            if (this.direction == 1 && (grid[this.i][this.j+1] == 0 || grid[this.i][this.j-1] == 0)) {
+                if ((this.position.y >= this.i * gameState.cellSize + this.pxTocenter && this.i != this.switchCell.i)) {
+                    if (Math.random() > 0.4) this.axis = 'hor';
+                    this.switchCell.i = this.i;
+                    this.switchCell.j = this.j;
                 }
-            } else if (this.direction == -1 && (grid[i][j+1] == 0 || grid[i][j-1] == 0)) {
-                if (this.position.y <= i * gameState.cellSize + this.pxTocenter && i != this.switchCell.i) {
-                    if (Math.random() > 0.5) this.axis = 'hor';
-                    if (Math.random() > 0.5) this.direction = 1;
-                    this.switchCell.i = i;
-                    this.switchCell.j = j;
+            } else if (this.direction == -1 && (grid[this.i][this.j+1] == 0 || grid[this.i][this.j-1] == 0)) {
+                if (this.position.y <= this.i * gameState.cellSize + this.pxTocenter && this.i != this.switchCell.i) {
+                    if (Math.random() > 0.4) this.axis = 'hor';
+                    this.switchCell.i = this.i;
+                    this.switchCell.j = this.j;
                 }
             }
         }
@@ -106,71 +101,70 @@ export class Enemy {
     }
 
     moveRight(grid) {
-        const i = Math.trunc((this.position.y) / gameState.cellSize);
-        const j = Math.trunc((this.position.x + this.size) / gameState.cellSize);
-        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
+        this.i = Math.trunc((this.position.y) / gameState.cellSize);
+        this.j = Math.trunc((this.position.x + this.size) / gameState.cellSize);
+        this.bombCell = (bomb.exist) && (bomb.cell.i == this.i && bomb.cell.j == this.j);
         
-        if (grid[i][j] == 0 && !bombCell) {
+        if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.x += this.speed;
             this.positionInCell.x += this.speed;
         } else {
             this.direction = -1;
-            this.switchCell.i = i;
-            this.switchCell.j = j-1;
+            this.switchCell.i = this.i;
+            this.switchCell.j = this.j-1;
         }
     }
 
     moveLeft(grid) {
-        const i = Math.trunc((this.position.y) / gameState.cellSize);
-        const j = Math.trunc((this.position.x) / gameState.cellSize);
-        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
+        this.i = Math.trunc((this.position.y) / gameState.cellSize);
+        this.j = Math.trunc((this.position.x) / gameState.cellSize);
+        this.bombCell = (bomb.exist) && (bomb.cell.i == this.i && bomb.cell.j == this.j);
 
-        if (grid[i][j] == 0 && !bombCell) {
+        if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.x -= this.speed;
             this.positionInCell.x -= this.speed;
         } else {
             this.direction = 1;
-            this.switchCell.i = i;
-            this.switchCell.j = j+1;
+            this.switchCell.i = this.i;
+            this.switchCell.j = this.j+1;
         }
     }
 
     moveUp(grid) {
-        const i = Math.trunc((this.position.y) / gameState.cellSize);
-        const j = Math.trunc((this.position.x) / gameState.cellSize);
-        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
+        this.i = Math.trunc((this.position.y) / gameState.cellSize);
+        this.j = Math.trunc((this.position.x) / gameState.cellSize);
+        this.bombCell = (bomb.exist) && (bomb.cell.i == this.i && bomb.cell.j == this.j);
 
-        if (grid[i][j] == 0 && !bombCell) {
+        if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.y -= this.speed;
             this.positionInCell.y -= this.speed;
         } else {
             this.direction = 1;
-            this.switchCell.i = i+1;
-            this.switchCell.j = j;
+            this.switchCell.i = this.i+1;
+            this.switchCell.j = this.j;
         }
     }
 
     moveDown(grid) {
-        const i = Math.trunc((this.position.y + this.size) / gameState.cellSize);
-        const j = Math.trunc((this.position.x) / gameState.cellSize);
-        const bombCell = (bomb.exist) && (bomb.cell.i == i && bomb.cell.j == j);
+        this.i = Math.trunc((this.position.y + this.size) / gameState.cellSize);
+        this.j = Math.trunc((this.position.x) / gameState.cellSize);
+        this.bombCell = (bomb.exist) && (bomb.cell.i == this.i && bomb.cell.j == this.j);
 
-        if (grid[i][j] == 0 && !bombCell) {
+        if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.y += this.speed;
             this.positionInCell.y += this.speed;
         } else {
             this.direction = -1;
-            this.switchCell.i = i-1;
-            this.switchCell.j = j;
+            this.switchCell.i = this.i-1;
+            this.switchCell.j = this.j;
         }
     }
 
     animate(currentTime) {
-        const cellSize = gameState.cellSize
         if (currentTime - this.sprite.lastUpdate > this.sprite.animationSpeed) {
             this.sprite.currentFrame = (this.sprite.currentFrame + 1) % this.sprite.frameCount;
             this.sprite.lastUpdate = currentTime;
-            this.element.style.backgroundPosition = `-${this.sprite.currentFrame * (cellSize * 0.8)}px 0px`;
+            this.element.style.backgroundPosition = `-${this.sprite.currentFrame * (gameState.cellSize * 0.8)}px 0px`;
         }
     }
 

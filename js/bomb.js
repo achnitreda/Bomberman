@@ -1,5 +1,5 @@
 import { player } from "./player.js"
-import { gateCell, setScore } from "./map.js";
+import { gateCell, logoMove, setScore } from "./map.js";
 import { gameState } from "./main.js";
 
 export const bomb = {
@@ -74,7 +74,7 @@ export const bomb = {
         for (let cell in this.cellsAffected) {
             const [i, j] = this.cellsAffected[cell];
             if (grid[i][j] == 1 || grid[i][j] == 0) {
-                this.applyExplosionEffect(i, j);
+                // this.applyExplosionEffect(i, j);
                 const cell = document.getElementById(`cell${i}#${j}`);
                 // gate cell
                 if (i == gateCell[0] && j == gateCell[1]) {
@@ -94,10 +94,11 @@ export const bomb = {
 
             // enimies 
             gameState.enemies.forEach((enemy, index) => {
-                if (Math.trunc((enemy.position.y + (enemy.size * 0.5))/cellSize) == i && Math.trunc((enemy.position.x + (enemy.size * 0.5))/cellSize) == j) {
-                    gameState.enemies.splice(index, 1);
+                if (enemy && Math.trunc((enemy.position.y + (enemy.size * 0.5))/cellSize) == i && Math.trunc((enemy.position.x + (enemy.size * 0.5))/cellSize) == j) {
                     enemy.element.remove();
+                    gameState.enemies[index] = null;
                     gameState.score += 15;
+                    gameState.enemiesNb -= 1;
                     setScore(gameState.score);
                 }
             })

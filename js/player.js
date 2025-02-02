@@ -52,58 +52,46 @@ const player = {
     },
 
     move: function (direction, grid) {
-        const centerY = (Math.trunc((this.position.y + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
-        const centerX = (Math.trunc((this.position.x + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
+        this.centerY = (Math.trunc((this.position.y + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
+        this.centerX = (Math.trunc((this.position.x + (this.size * 0.5)) / gameState.cellSize) * gameState.cellSize) + (gameState.cellSize - this.size) * 0.5;
 
         switch (direction) {
-            case "Right": this.moveRight(centerY, grid); break;
-            case "Left": this.moveLeft(centerY, grid); break;
-            case "Up": this.moveUp(centerX, grid); break;
-            case "Down": this.moveDown(centerX, grid); break;
+            case "Right": this.moveRight(grid); break;
+            case "Left": this.moveLeft(grid); break;
+            case "Up": this.moveUp(grid); break;
+            case "Down": this.moveDown(grid); break;
         }
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     },
 
-    moveRight: function (centerY, grid) {
-        const i = Math.trunc((this.position.y) / gameState.cellSize);
-        const j = Math.trunc((this.position.x + this.size) / gameState.cellSize);
-        
-        if (Math.abs(centerY - this.position.y) > this.speed) {
-            this.position.y += centerY > this.position.y ? this.speed : -this.speed;
-        } else if (grid[i][j] == 0) {
+    moveRight: function (grid) {
+        if (Math.abs(this.centerY - this.position.y) > this.speed) {
+            this.position.y += this.centerY > this.position.y ? this.speed : -this.speed;
+        } else if (grid[Math.trunc((this.position.y) / gameState.cellSize)][Math.trunc((this.position.x + this.size) / gameState.cellSize)] == 0) {
             this.position.x += this.speed;
         }
     },
 
-    moveLeft: function (centerY, grid) {
-        const i = Math.trunc((this.position.y) / gameState.cellSize);
-        const j = Math.trunc((this.position.x) / gameState.cellSize);
-
-        if (Math.abs(centerY - this.position.y) > this.speed) {
-            this.position.y += centerY > this.position.y ? this.speed : -this.speed;
-        } else if (grid[i][j] == 0) {
+    moveLeft: function (grid) {
+        if (Math.abs(this.centerY - this.position.y) > this.speed) {
+            this.position.y += this.centerY > this.position.y ? this.speed : -this.speed;
+        } else if (grid[ Math.trunc((this.position.y) / gameState.cellSize)][Math.trunc((this.position.x) / gameState.cellSize)] == 0) {
             this.position.x -= this.speed;
         }
     },
 
-    moveDown: function (centerX, grid) {
-        const i = Math.trunc((this.position.y + this.size) / gameState.cellSize);
-        const j = Math.trunc((this.position.x) / gameState.cellSize);
-        
-        if (Math.abs(centerX - this.position.x) > this.speed) {
-            this.position.x += centerX > this.position.x ? this.speed : -this.speed;
-        } else if (grid[i][j] == 0) {
+    moveDown: function (grid) {
+        if (Math.abs(this.centerX - this.position.x) > this.speed) {
+            this.position.x += this.centerX > this.position.x ? this.speed : -this.speed;
+        } else if (grid[Math.trunc((this.position.y + this.size) / gameState.cellSize)][Math.trunc((this.position.x) / gameState.cellSize)] == 0) {
             this.position.y += this.speed;
         }
     },
 
-    moveUp: function (centerX, grid) {
-        const i = Math.trunc((this.position.y) / gameState.cellSize);
-        const j = Math.trunc((this.position.x) / gameState.cellSize);
-        
-        if (Math.abs(centerX - this.position.x) > this.speed) {
-            this.position.x += centerX > this.position.x ? this.speed : -this.speed;
-        } else if (grid[i][j] == 0) {
+    moveUp: function (grid) {  
+        if (Math.abs(this.centerX - this.position.x) > this.speed) {
+            this.position.x += this.centerX > this.position.x ? this.speed : -this.speed;
+        } else if (grid[Math.trunc((this.position.y) / gameState.cellSize)][Math.trunc((this.position.x) / gameState.cellSize)] == 0) {
             this.position.y -= this.speed;
         }
     },
@@ -130,8 +118,8 @@ const player = {
         this.alive = false;
         this.element.classList.remove('opacity1');
         this.element.style.backgroundPosition = `0px 0px`;
-        this.position.x = cellSize + Math.floor((cellSize - this.size) * 0.5);
-        this.position.y = cellSize + Math.floor((cellSize - this.size) * 0.5);
+        this.position.x = cellSize + Math.trunc((cellSize - this.size) * 0.5);
+        this.position.y = cellSize + Math.trunc((cellSize - this.size) * 0.5);
         setNbOfHearts(this.lifes);
         this.deathTime = time;
     }

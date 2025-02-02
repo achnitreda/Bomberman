@@ -1,5 +1,5 @@
 import { gameLoop, gameState } from "./main.js";
-import { mapVisual, setNbOfHearts } from "./map.js";
+import { logoMove, mapVisual, setNbOfHearts } from "./map.js";
 import { player } from "./player.js";
 
 function showWinScreen() {
@@ -24,6 +24,7 @@ function startNewLevel() {
     gameState.board.innerHTML = '';
     gameState.level++;
     gameState.enimiesNumber += 2;
+    gameState.enemiesNb = gameState.enimiesNumber;
     player.lifes++;
     player.element.style.backgroundPosition = `0px 0px`;
     gameState.grid = mapVisual();
@@ -31,10 +32,7 @@ function startNewLevel() {
 }
 
 function checkWinCondition(gameState, enemies, gateCell) {
-    
-    
-    if (enemies.length === 0 &&
-        Math.trunc((player.position.y + (player.size*0.5))/ gameState.cellSize) === gateCell[0] &&
+    if (Math.trunc((player.position.y + (player.size*0.5))/ gameState.cellSize) === gateCell[0] &&
         Math.trunc((player.position.x + (player.size*0.5))/ gameState.cellSize) === gateCell[1]) {
         gameState.gameWon = true;
         showWinScreen();
@@ -42,8 +40,7 @@ function checkWinCondition(gameState, enemies, gateCell) {
 }
 
 function checkLevelWinCondition(gameState, enemies, gateCell) {
-    if (enemies.length === 0 &&
-        Math.trunc((player.position.y + (player.size*0.5))/ gameState.cellSize) === gateCell[0] &&
+    if (Math.trunc((player.position.y + (player.size*0.5))/ gameState.cellSize) === gateCell[0] &&
         Math.trunc((player.position.x + (player.size*0.5))/ gameState.cellSize) === gateCell[1]) {
         showLevelWinScreen();
     }

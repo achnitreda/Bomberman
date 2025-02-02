@@ -8,6 +8,7 @@ import { checkLoseCondition, checkWinCondition, checkLevelWinCondition } from ".
 export const gameState = {
     level: 0,
     enimiesNumber: 3,
+    enemiesNb: 3,
     enemies: [],
     score: 0,
     storyTime: false,
@@ -26,17 +27,17 @@ export const gameState = {
 
 export function gameLoop(currentTime) {
     if (!gameState.gameWon && !gameState.gameLost && !gameState.isPaused && !gameState.storyTime) {
-        const sec = Math.floor(gameState.framesNb / 60);
-        const minu = Math.floor(sec / 60);
+        const sec = Math.trunc(gameState.framesNb / 60);
+        const minu = Math.trunc(sec / 60);
         setTimer(sec, minu, gameState.timeElement);
 
         if (gameState.movementKeys[0] && player.alive) {
             player.move(gameState.movementKeys[0].slice(5), gameState.grid);
             player.animation(currentTime, gameState.movementKeys[0].slice(5));
 
-            // those to be optimized
-            if (gameState.stage == 2) checkWinCondition(gameState, gameState.enemies, gateCell);
-            else checkLevelWinCondition(gameState, gameState.enemies, gateCell);
+
+            if (gameState.level == 2 && gameState.enemiesNb == 0) checkWinCondition(gameState, gameState.enemies, gateCell);
+            else if (gameState.enemiesNb == 0) checkLevelWinCondition(gameState, gameState.enemies, gateCell);
         }
 
         // player death animation
@@ -81,10 +82,12 @@ export function gameLoop(currentTime) {
         }
 
         // enemies
-        if (gameState.enemies.length > 0) {
+        if (gameState.enemiesNb > 0) {
             gameState.enemies.forEach(enemy => {
-                enemy.move(gameState.grid, currentTime);
-                enemy.animate(currentTime);
+                 if (enemy != null) {
+                    enemy.move(gameState.grid, currentTime);
+                    enemy.animate(currentTime);
+                }
             })
         }
         gameState.framesNb++;
