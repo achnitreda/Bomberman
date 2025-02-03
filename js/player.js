@@ -64,6 +64,7 @@ const player = {
         this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     },
 
+    // const posx = newX % 32 /32
     moveRight: function (grid) {
         if (Math.abs(this.centerY - this.position.y) > this.speed) {
             this.position.y += this.centerY > this.position.y ? this.speed : -this.speed;

@@ -30,20 +30,17 @@ export class Enemy {
         this.pxTocenter = Math.trunc((gameState.cellSize - this.size) * 0.5) + 1;
         this.position.x = (gameState.cellSize * this.initCell.j) + this.pxTocenter;
         this.position.y = (gameState.cellSize * this.initCell.i) + this.pxTocenter;
-        this.positionInCell.x = this.pxTocenter;
-        this.positionInCell.y = this.pxTocenter;
-        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
     }
 
     create(i, j) {
-        const enimieCell = document.getElementById(`cell${i}#${j}`);
         this.element = document.createElement('div');
         this.element.classList.add('enemy');
         this.initCell.i = i;
         this.initCell.j = j;
         this.axis = (Math.random() > 0.5 ? 'hor' : 'ver');
         this.setEnemyProperties();
-        enimieCell.appendChild(this.element);
+        gameState.board.appendChild(this.element);
     }
 
     switchAxis(grid) {
@@ -91,7 +88,7 @@ export class Enemy {
             else this.moveUp(grid);
         }
 
-        this.element.style.transform = `translate(${this.positionInCell.x}px, ${this.positionInCell.y}px)`;
+        this.element.style.transform = `translate(${this.position.x}px, ${this.position.y}px)`;
         this.switchAxis(grid);
 
         if (this.collisionWithplayer()) {
@@ -107,7 +104,6 @@ export class Enemy {
         
         if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.x += this.speed;
-            this.positionInCell.x += this.speed;
         } else {
             this.direction = -1;
             this.switchCell.i = this.i;
@@ -122,7 +118,6 @@ export class Enemy {
 
         if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.x -= this.speed;
-            this.positionInCell.x -= this.speed;
         } else {
             this.direction = 1;
             this.switchCell.i = this.i;
@@ -137,7 +132,6 @@ export class Enemy {
 
         if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.y -= this.speed;
-            this.positionInCell.y -= this.speed;
         } else {
             this.direction = 1;
             this.switchCell.i = this.i+1;
@@ -152,7 +146,6 @@ export class Enemy {
 
         if (grid[this.i][this.j] == 0 && !this.bombCell) {
             this.position.y += this.speed;
-            this.positionInCell.y += this.speed;
         } else {
             this.direction = -1;
             this.switchCell.i = this.i-1;

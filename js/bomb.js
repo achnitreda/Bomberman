@@ -74,8 +74,9 @@ export const bomb = {
         for (let cell in this.cellsAffected) {
             const [i, j] = this.cellsAffected[cell];
             if (grid[i][j] == 1 || grid[i][j] == 0) {
-                // this.applyExplosionEffect(i, j);
+                this.applyExplosionEffect(i, j);
                 const cell = document.getElementById(`cell${i}#${j}`);
+                
                 // gate cell
                 if (i == gateCell[0] && j == gateCell[1]) {
                     cell.classList = "cell gate";

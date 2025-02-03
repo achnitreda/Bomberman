@@ -72,7 +72,6 @@ body::before {
   position: absolute;
   width: calc(var(--cellSize) * 0.8);
   height: calc(var(--cellSize) * 0.8);
-  /* background-color: aqua; */
   background-image: url("./bomberman.png");
   z-index: 10;
 }
