@@ -10,8 +10,15 @@ const soft = 1;
 const solid = 2;
 const specialSolid = 3;
 let softs = [];
-export const enemies = [];
-export const stuckEnemies = [];
+const logo = {
+    element: document.getElementById('logo'),
+    dir: 1,
+}
+
+export function logoMove() {
+    logo.element.style.transform = `translate(${logo.dir*.1}px, 0px)`;
+    logo.dir *= -1;
+}
 
 function randomNumber() {
     return (Math.random() < 0.6) ? empty : soft
@@ -25,34 +32,33 @@ function stuckPosition(grid, i, j) {
 function getRandomIndexes(grid) {
         const nums = new Set();
         while (nums.size < gameState.enimiesNumber) {
-            const index = Math.floor(Math.random() * enemiesCells.length);
+            const index = Math.trunc(Math.random() * enemiesCells.length);
             const [i, j] = enemiesCells[index]
             if (!stuckPosition(grid, i, j)) nums.add(index);
         }
         return Array.from(nums);
 }
 
-function fixAxis(enemy) {
+function fixAxis(enemy, grid) {
     if (enemy.axis == 'hor') {
-        if (!enemy.passability.right && !enemy.passability.left) {
-            enemy.axis = 'ver'
+        if (grid[enemy.initCell.i][enemy.initCell.j+1] != 0 && grid[enemy.initCell.i][enemy.initCell.j-1] != 0) {
+            enemy.axis = 'ver';
         }
     } else {
-        if (!enemy.passability.top && !enemy.passability.bottom) {
-            enemy.axis = 'hor'
+        if (grid[enemy.initCell.i+1][enemy.initCell.j] != 0 && grid[enemy.initCell.i-1][enemy.initCell.j] != 0) {
+            enemy.axis = 'hor';
         }   
     }
 }
 
 function addEnimies(grid) {
     const indexes = getRandomIndexes(grid);
-
     indexes.forEach((el) => {
         const [i, j] = enemiesCells[el];
         const enemy = new Enemy();
         enemy.create(i, j, grid);
-        fixAxis(enemy);
-        enemies.push(enemy);
+        fixAxis(enemy, grid);
+        gameState.enemies.push(enemy);
     })
 }
 
@@ -87,15 +93,15 @@ function mapGrid() {
     }
 
     // random gate cell
-    gateCell = softs[Math.floor(Math.random() * softs.length)];
+    gateCell = softs[Math.trunc(Math.random() * softs.length)];
     console.log(gateCell);
-
+    
     return grid;
 }
 
 export function mapVisual() {
     const grid = mapGrid();
-    gameState.player.setPlayerProperties(gameState.cellSize);
+    gameState.player.setProperties(gameState.cellSize, 1, 1);
 
     enemiesCells = [];
     grid.forEach((row, i) => {
@@ -104,16 +110,16 @@ export function mapVisual() {
             cell.classList.add('cell');
             if (el == specialSolid) {
                 cell.classList.add('spSolid');
-                cell.style.backgroundPosition = `${-2 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-2 * gameState.cellSize}px ${-(gameState.level * gameState.cellSize)}px`;
             } else if (el == solid) {
                 cell.classList.add('solid');
-                cell.style.backgroundPosition = `0px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `0px ${-(gameState.level * gameState.cellSize)}px`;
             } else if (el == soft) {
                 cell.classList.add('soft');
-                cell.style.backgroundPosition = `${-3 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-3 * gameState.cellSize}px ${-(gameState.level * gameState.cellSize)}px`;
             } else {
                 cell.classList.add('empty');
-                cell.style.backgroundPosition = `${-1 * gameState.cellSize}px ${-(gameState.stage * gameState.cellSize)}px`;
+                cell.style.backgroundPosition = `${-1 * gameState.cellSize}px ${-(gameState.level * gameState.cellSize)}px`;
                 if (i >= 2 && j > 1 && (i + 1) % 2 == 0 && (j + 1) % 2 == 0) {
                     enemiesCells.push([i, j])
                 }
@@ -125,7 +131,6 @@ export function mapVisual() {
     });
 
     addEnimies(grid);
-    gameState.player.updateBounds(grid, gameState.cellSize);
 
     return grid;
 }

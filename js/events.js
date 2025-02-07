@@ -1,7 +1,8 @@
-import { gameState, gameLoop } from "./main.js";
+import { gameState } from "./main.js";
 import { handleResize } from "./responsive.js";
 import { bomb } from "./bomb.js";
-import { startNewStage } from "./gameProgress.js";
+import { startNewLevel } from "./gameProgress.js";
+import { mapVisual, setNbOfHearts } from "./map.js";
 
 const pauseMenu = document.getElementById('pause-menu');
 const continueBtn = document.getElementById('continue-btn');
@@ -20,82 +21,76 @@ function togglePause() {
         if (bomb.exist) {
             bomb.timerId = setTimeout(() => bomb.explode = true, 1500)
         }
-        requestAnimationFrame(gameLoop);
     }
 }
 
 function restartGame() {
-    location.reload();
+    location.reload()
 }
 
 export function setEvents() {
-    // puse or contiue the game
+    // Pause/continue game
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             togglePause();
         }
     });
 
-    // restart or continue the game
+    // Game controls
     continueBtn.addEventListener('click', togglePause);
     restartBtn.addEventListener('click', restartGame);
 
-    // handle resizing
+    // Window resizing
     window.addEventListener('resize', () => handleResize(gameState));
 
-    // place bomb
+    // Bomb placement
     document.addEventListener("keypress", e => {
-        if (gameState.gameWon || gameState.gameLost) {
+        if (gameState.gameWon || gameState.gameLost || gameState.storyTime) {
             return;
         }
-    
-        if (e.key.toLowerCase() == 'z') {
+        if (e.key.toLowerCase() === 'z') {
             if (!bomb.exist && gameState.player.alive) gameState.placeBomb = true;
         }
-    })
+    });
 
-    // player movement control 
+    // Player movement
     document.addEventListener("keydown", (e) => {
-        if (gameState.gameWon || gameState.gameLost) {
+        if (gameState.gameWon || gameState.gameLost || gameState.storyTime) {
             return;
         }
-    
         if (e.key.startsWith('Arrow')) {
             if (!gameState.movementKeys.includes(e.key)) {
                 gameState.movementKeys.unshift(e.key);
             }
         }
-    })
+    });
 
     document.addEventListener("keyup", (e) => {
-        if (gameState.gameWon || gameState.gameLost) {
+        if (gameState.gameWon || gameState.gameLost || gameState.storyTime) {
             return;
         }
-    
         if (e.key.startsWith('Arrow')) {
-            gameState.movementKeys.splice(gameState.movementKeys.indexOf(e.key), 1)
+            gameState.movementKeys.splice(gameState.movementKeys.indexOf(e.key), 1);
         }
-    })
+    });
 
-    document.querySelector('#level-win button').addEventListener('click', () => {
-        startNewStage();
-        document.querySelector('.level-win').classList.add('hidden');
-    })
+     // Popup handlers
+    document.querySelector('#stage1-win button').addEventListener('click', () => {
+        startNewLevel();
+        document.querySelector('#stage1-win').classList.add('hidden');
+    });
+    
+    document.querySelector('#stage2-win button').addEventListener('click', () => {
+        startNewLevel();
+        document.querySelector('#stage2-win').classList.add('hidden');
+    });
+
+    document.getElementById('close-intro').addEventListener('click', () => {
+        document.getElementById('intro-popup').classList.add('hidden');
+        gameState.storyTime = false;
+    });
+      
+    document.getElementById('start-btn').addEventListener('click', () => {
+        document.getElementById('how-to-play').classList.add('hidden');
+    });
 }
-
-
-function showLevelMessage() {
-    const levelMessage = document.getElementById('level-message');
-    levelMessage.classList.remove('hidden');
-    setTimeout(() => {
-        levelMessage.classList.add('hidden');
-    }, 10000);
-}
-
-setTimeout(() => {
-    showLevelMessage();
-}, 500);
-
-document.getElementById('close-message').addEventListener('click', () => {
-    document.getElementById('level-message').classList.add('hidden');
-});

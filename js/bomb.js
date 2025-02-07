@@ -1,12 +1,13 @@
 import { player } from "./player.js"
-import { gateCell, enemies, stuckEnemies, setScore } from "./map.js";
+import { gateCell, logoMove, setScore } from "./map.js";
 import { gameState } from "./main.js";
 
 export const bomb = {
     element: null,
     exist: false,
-    explode : false,
-    cell: null,
+    cell: {i: 0, j: 0},
+    createTime: null,
+    explode: false,
     timerId: null,
 
     cellsAffected: {
@@ -28,11 +29,8 @@ export const bomb = {
     updateSize: function (cellSize) {
         this.sprite.frameSize = cellSize * 0.8;
         if (this.element) {
-            const pxToCenter = Math.floor((cellSize - this.sprite.frameSize) / 2);
-            this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px)`;
-
-            const x = this.sprite.currentFrame * this.sprite.frameSize;
-            this.element.style.backgroundPosition = `-${x}px 0px`;
+            this.element.style.transform = `translate(${Math.trunc((cellSize - this.sprite.frameSize) / 2)}px, ${Math.trunc((cellSize - this.sprite.frameSize) / 2)}px)`;
+            this.element.style.backgroundPosition = `-${this.sprite.currentFrame * this.sprite.frameSize}px 0px`;
         }
     },
 
@@ -40,13 +38,11 @@ export const bomb = {
         if (currentTime - this.sprite.lastUpdate > this.sprite.animationSpeed) {
             this.sprite.currentFrame = (this.sprite.currentFrame + 1) % this.sprite.frameCount;
             this.sprite.lastUpdate = currentTime;
-
-            const x = this.sprite.currentFrame * this.sprite.frameSize;
-            this.element.style.backgroundPosition = `-${x}px 0px`;
+            this.element.style.backgroundPosition = `-${this.sprite.currentFrame * this.sprite.frameSize}px 0px`;
         }
     },
 
-    updateCellsAffected: function () {
+    setCellsAffected: function () {
         this.cellsAffected.center = [this.cell.i, this.cell.j];
         this.cellsAffected.right = [this.cell.i, this.cell.j + 1];
         this.cellsAffected.left = [this.cell.i, this.cell.j - 1];
@@ -54,83 +50,62 @@ export const bomb = {
         this.cellsAffected.top = [this.cell.i - 1, this.cell.j];
     },
 
-    create: function (cellSize) {
-        this.sprite.frameSize = cellSize * 0.8;
-        const pxToCenter = (cellSize - this.sprite.frameSize) * 0.5;
-        this.cell = { i: player.currentCell.i, j: player.currentCell.j };
-        this.updateCellsAffected();
-
+    create: function (time) {
+        this.sprite.frameSize = gameState.cellSize * 0.8;
+        this.cell.i = Math.trunc((player.position.y + (player.size * 0.5)) / gameState.cellSize);
+        this.cell.j = Math.trunc((player.position.x + (player.size * 0.5)) / gameState.cellSize);
+        this.setCellsAffected();
         const bombCell = document.getElementById(`cell${this.cell.i}#${this.cell.j}`);
         this.element = document.createElement("div");
         this.element.classList.add("bomb");
-        this.element.style.transform = `translate(${pxToCenter}px, ${pxToCenter}px`;
-
+        this.element.style.transform = `translate(${(gameState.cellSize - this.sprite.frameSize) * 0.5}px, ${(gameState.cellSize - this.sprite.frameSize) * 0.5}px`;
         bombCell.appendChild(this.element);
-        this.timerId = setTimeout( () => {
-            this.explode = true;
-        }, 1500)
+        this.createTime = time;
     },
 
-    applyExplosionEffect : (i, j) => {
+    applyExplosionEffect: (i, j) => {
         const cell = document.getElementById(`cell${i}#${j}`);
         const explosion = document.createElement('div');
         explosion.classList.add('explosion-effect');
         cell.appendChild(explosion);
     },
 
-    explosion: function (grid, cellSize) {
-                for (let cell in this.cellsAffected) {
-                    const [i, j] = this.cellsAffected[cell];
-
-                    if (grid[i][j] == 1 || grid[i][j] == 0) {
-                        this.applyExplosionEffect(i, j);
-                        const cell = document.getElementById(`cell${i}#${j}`);
-
-                        // gate cell
-                        if (i == gateCell[0] && j == gateCell[1]) {
-                            cell.classList = "cell gate";
-                            cell.style.backgroundImage = 'none';
-                        } else {
-                            cell.style.backgroundPosition = `${-cellSize}px ${-(gameState.stage)*cellSize}px`;
-                        }
-                        cell.classList = (i == gateCell[0] && j == gateCell[1]) ? "cell gate" : "cell empty";
-                        grid[i][j] = 0;
-                    }
-
-                    //player
-                    if ((player.currentCell.i == i && player.currentCell.j == j)) {
-                        player.death(cellSize);
-                    }
-
-                    // enimies 
-                    let enemiesDied = 0;
-                    enemies.forEach((enemy, index) => {
-                        if (enemy.cell.i == i && enemy.cell.j == j) {
-                            enemies.splice(index, 1);
-                            // enemiesIndexes.splice(index, 1);
-                            enemy.element.remove();
-                            player.score == 15;
-                            enemiesDied++;
-                        }
-                    })
-
-                    if (enemiesDied >= 2) {
-                        player.score += enemiesDied * 2 * 15;
-                        setScore(player.score);
-                    } else if (enemiesDied == 1) {
-                        player.score += 15;
-                        setScore(player.score);
-                    }
-
-                    // stuck enemies 
-                    stuckEnemies.forEach(enemy => {
-                        enemy.updateBounds(grid)
-                    })
-
+    explosion: function (grid, cellSize, time) {
+        for (let cell in this.cellsAffected) {
+            const [i, j] = this.cellsAffected[cell];
+            if (grid[i][j] == 1 || grid[i][j] == 0) {
+                this.applyExplosionEffect(i, j);
+                const cell = document.getElementById(`cell${i}#${j}`);
+                
+                // gate cell
+                if (i == gateCell[0] && j == gateCell[1]) {
+                    cell.classList = "cell gate";
+                    cell.style.backgroundImage = 'none';
+                } else {
+                    cell.classList = "cell empty";
+                    cell.style.backgroundPosition = `${-cellSize}px ${-(gameState.level) * cellSize}px`;
                 }
+                grid[i][j] = 0;
+            }
+            
+            //player
+            if (Math.trunc((player.position.y + (player.size * 0.5)) / cellSize) == i && Math.trunc((player.position.x + (player.size * 0.5)) / cellSize) == j) {
+                player.death(cellSize, time);
+            }
 
-                this.cell = null;
-                this.element.style.opacity = '0';
-                this.exist = false;
+            // enimies 
+            gameState.enemies.forEach((enemy, index) => {
+                if (enemy && Math.trunc((enemy.position.y + (enemy.size * 0.5))/cellSize) == i && Math.trunc((enemy.position.x + (enemy.size * 0.5))/cellSize) == j) {
+                    enemy.element.remove();
+                    gameState.enemies[index] = null;
+                    gameState.score += 15;
+                    gameState.enemiesNb -= 1;
+                    setScore(gameState.score);
+                }
+            })
+
+        }
+        this.element.remove();
+        this.createTime = 0;
     },
 }

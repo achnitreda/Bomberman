@@ -4,17 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./style.css" />
+    <style>
+      @import url('https://fonts.cdnfonts.com/css/arcade-classic');
+    </style>
     <title>BomberMan</title>
   </head>
   <body>
+    <div class="start-screen">
+      <!-- How to Play Popup -->
+      <div id="how-to-play" class="win-popup">
+        <h2>🕹️ HOW TO PLAY</h2>
+        <ul>
+          <li>💣 Place a Bomb: Press [Z]</li>
+          <li>⏸ Pause the Game: Press [Esc]</li>
+          <li>🎮 Move Your Character: Use Arrow Keys [←][↑][→][↓]</li>
+        </ul>
+      </div>
+      <button id="start-btn" class="start-btn">START GAME</button>
+    </div>
+
+    <div id="logo"></div>
     <div id="board">
       <div class="gameState">
         <div class="lifes">
           Lifes:
           <span>3</span>
-          <span
-            ><img src="./heart.svg" width="15px" height="15px" alt="heart"
-          /></span>
+          <span><img src="./heart.svg" width="15px" height="15px" alt="heart"></span>
         </div>
         <div class="timer">
           Time:
@@ -28,27 +43,47 @@
       <div id="player"></div>
       <div id="map"></div>
     </div>
-    <div id="win-screen" class="win-screen hidden">
+
+    <!-- Game Popups -->
+    <div id="intro-popup" class="win-screen hidden">
       <div class="win-popup">
-        <h2>You Win!</h2>
-        <p>Congratulations, hero! You've successfully shut down the hostile AI and saved humanity! The world is safe thanks to your bravery and skill </p>
-        <button onclick="location.reload()">Play Again</button>
+        <h2>🎮 WELCOME TO BOMBERMAN</h2>
+        <p>Life is a journey filled with trials and choices. To truly understand its meaning, you must walk through the fires of Evil, endure the tests of Good, and seek the ultimate reward: Inner Peace. Your journey begins in a cursed world, a land of shadows and chaos. The air is thick with the scent of sulfur, the ground cracked by infernal heat. Demonic forces lurk in the darkness, watching, waiting. Every step forward is met with traps, destruction, and relentless enemies that embody fear, doubt, and despair—whispers that tell you to give up, illusions that trick you into failure. But even in the darkest night, the light of perseverance shines brightest. You must survive. You must fight. Because in life, challenges will come, but only those who persist will move forward.</p>
+        <button id="close-intro">×</button>
       </div>
     </div>
-    <div id="level-win" class="level-win hidden">
+
+    <div id="win-screen" class="win-screen hidden">
       <div class="win-popup">
-        <h2>You Are On The Right WAY!</h2>
-        <p>Level cleared! The path ahead is now open. Let's go to continue your mission.</p>
-        <button>Continue →</button>
+        <h2>🏆 YOU WIN!</h2>
+        <p>🎊 Congratulations! You have completed the journey and discovered the truth: Life is not just about Good or Evil, but about balance. You have faced darkness without losing hope, endured trials without losing your way, and conquered your own mind without giving in to fear. Those who embrace both their struggles and their triumphs will find true inner peace. And remember—life will always throw new challenges at you. But now, you know how to face them. Whenever life challenges you, remember—you control your own path. Never stop moving forward… and if you see life doesn’t look the way you want it to, do it again. Restart. Try again. Because the journey is yours to shape.</p>
+        <button onclick="location.reload()">PLAY AGAIN</button>
+      </div>
+    </div>
+
+    <div id="stage1-win" class="level-win hidden">
+      <div class="win-popup">
+        <h2>🌟 STAGE 1 COMPLETE!</h2>
+        <p>Congratulations! You have conquered the darkness and proven that even the strongest storms can be endured. But your journey is far from over... Ahead lies a land bathed in light, where nature thrives, and peace fills the air. Yet peace is fragile, and true goodness is always tested. The enemies of this world are not demons of fire, but illusions of comfort. They come in the form of distractions, complacency, and false hope, luring you into a false sense of security. Many fail here, mistaking ease for victory. But life is not just about reaching a place of comfort—it is about overcoming the hidden trials that come with it. Will you stay strong on your path? Will you prove that true goodness is not just about choosing the easy way, but about persevering through trials with integrity?</p>
+        <button>CONTINUE →</button>
+      </div>
+    </div>
+
+    <div id="stage2-win" class="level-win hidden">
+      <div class="win-popup">
+        <h2>🌟 STAGE 2 COMPLETE!</h2>
+        <p>Well done! You have remained true to your path despite the trials. But your greatest challenge still lies ahead... You have walked through darkness and light, but now you must face the most dangerous enemy of all—yourself. This is the realm of Inner Peace—a place without external enemies, without traps, without destruction. But do not be fooled, for this is the hardest stage of all. The battle is now internal. Fear, regret, self-doubt—all the burdens you carry from your past will surface here, whispering to you, trying to break your balance. Can you silence the voices? Can you accept both your failures and victories as part of who you are? Life is not perfect, and neither are you. But peace comes not from eliminating struggle, but from embracing it.</p>
+        <button>CONTINUE →</button>
       </div>
     </div>
     <div id="lose-screen" class="lose-screen lose-hidden">
       <div class="lose-popup">
-        <h2>Game Over!</h2>
-        <p>You've run out of lives! Better luck next time!</p>
-        <button onclick="location.reload()">Try Again</button>
+        <h2>💀 GAME OVER!</h2>
+        <p>You have fallen in battle, but do not despair. Every great warrior stumbles before they rise again. True strength comes from learning, adapting, and never giving up. The enemies of darkness will return. The trials of the path will remain. The battle in your mind will still rage on. But each attempt makes you stronger. Stand up, dust yourself off, and face your fate once more. In life, failure is never the end—unless you choose to stop trying.</p>
+        <button onclick="location.reload()">TRY AGAIN</button>
       </div>
     </div>
+
     <div id="pause-menu" class="pause-screen pausehidden">
       <div class="pause-popup">
         <h2>Game Paused</h2>
@@ -56,15 +91,7 @@
         <button id="restart-btn">Restart</button>
       </div>
     </div>
-    <div id="level-message" class="level-message hidden">
-      <div class="message-content">
-        <img src="https://icons.iconarchive.com/icons/yellowicon/game-stars/128/Bomberman-icon.png" width="128" height="128" alt="Bomberman Icon">
-        <div class="message-text">
-          <p>In a world overrun by dangerous machines, you are humanity's last hope. As a skilled demolitions expert armed with specialized bombs, you must defeat these mechanical menaces to reach the final stage. Use the [←] [↑] [↓] [→] keys to move, [Z] to place bombs, and [ESC] to pause. Your mission is simple: eliminate all enemies, find the exit door, avoid enemy contact and your own explosions. Only by reaching the last level and entering the final door will you achieve victory. Remember, strategic bomb placement is key to survival - the fate of our world rests in your hands!</p>
-        </div>
-        <button id="close-message" class="close-button">×</button>
-      </div>
-    </div>    
+
     <script type="module" src="./js/main.js"></script>
   </body>
 </html>

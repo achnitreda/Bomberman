@@ -1,5 +1,5 @@
 import { bomb } from "./bomb.js";
-import { enemies } from "./map.js";
+import { player } from "./player.js";
 
 const MIN_CELL_SIZE = 24;
 const MAX_CELL_SIZE = 56;
@@ -11,8 +11,8 @@ export function calcCellSize() {
     const availableWidth = windowWidth * 0.8;
     const availableHeight = windowHeight * 0.8;
 
-    const cellByWidth = Math.floor(availableWidth / 15);
-    const cellByHeight = Math.floor(availableHeight / 13);
+    const cellByWidth = Math.trunc(availableWidth / 15);
+    const cellByHeight = Math.trunc(availableHeight / 13);
 
     let cellSize = Math.min(cellByWidth, cellByHeight);
 
@@ -35,39 +35,39 @@ const debounce = (func, wait = 0) => {
     }
 }
 
-function adaptPOsitions(stage, cellSize) {
+function adaptPOsitions(level, cellSize) {
     [...document.getElementsByClassName('empty')].forEach(cell => {
-        cell.style.backgroundPosition = `${-1*cellSize}px ${-(stage*cellSize)}px`;
+        cell.style.backgroundPosition = `${-1*cellSize}px ${-(level*cellSize)}px`;
     });
 
     [...document.getElementsByClassName('soft')].forEach(cell => {
-        cell.style.backgroundPosition = `${-3*cellSize}px ${-(stage*cellSize)}px`;
+        cell.style.backgroundPosition = `${-3*cellSize}px ${-(level*cellSize)}px`;
     });
 
     [...document.getElementsByClassName('solid')].forEach(cell => {
-        cell.style.backgroundPosition = `0px ${-(stage*cellSize)}px`;
+        cell.style.backgroundPosition = `0px ${-(level*cellSize)}px`;
     });
 
     [...document.getElementsByClassName('spSolid')].forEach(cell => {
-        cell.style.backgroundPosition = `${-2*cellSize}px ${-(stage*cellSize)}px`;
+        cell.style.backgroundPosition = `${-2*cellSize}px ${-(level*cellSize)}px`;
     });
 }
 
 export const handleResize = debounce((gameState) => {
+    const i = Math.trunc((player.position.y + (player.size*0.5)) / gameState.cellSize);
+    const j = Math.trunc((player.position.x + (player.size*0.5)) / gameState.cellSize);
     gameState.cellSize = calcCellSize();
-    
+
     
     //adapte the new backround position for each cell to match the new cell size
-    adaptPOsitions(gameState.stage, gameState.cellSize);
+    adaptPOsitions(gameState.level, gameState.cellSize);
 
     // reset enemies propertise to much the new sizes
-    enemies.forEach((enemy) => {
-        enemy.setEnemyProperties(gameState.cellSize);
-        enemy.updateBounds(gameState.grid);
+    gameState.enemies.forEach((enemy) => {
+        if (enemy) enemy.setEnemyProperties(gameState.cellSize);
     });
-
-    gameState.player.setPlayerProperties(gameState.cellSize);
-    gameState.player.updateBounds(gameState.grid, gameState.cellSize);
+    
+    gameState.player.setProperties(gameState.cellSize, i, j);
 
     if (bomb.exist) {
         bomb.updateSize(gameState.cellSize);
