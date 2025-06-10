@@ -4,7 +4,7 @@
 
 A high-performance, tile-based Bomberman game built entirely with vanilla JavaScript, HTML, and CSS. This project focuses on achieving consistent 60 FPS performance while implementing a custom tile engine and multiple game maps.
 
-*  [demo:Bomberman](https://x/)
+*  [demo:Bomberman](https://achnitreda.github.io/Bomberman/)
 
 ## 🎯 Core Objectives
 
